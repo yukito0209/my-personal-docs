@@ -25,7 +25,7 @@ export default function EducationCard({
   detailText,
 }: EducationCardProps) {
   return (
-    <div className="rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50">
+    <div className="rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 glass-effect">
       <div 
         className="cursor-pointer"
         onClick={() => window.open(schoolUrl, '_blank')}

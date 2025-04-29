@@ -10,7 +10,7 @@ interface InterestCardProps {
 
 function InterestCard({ icon, title, description }: InterestCardProps) {
   return (
-    <div className="flex flex-col items-center rounded-lg border bg-card p-6 text-center shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50">
+    <div className="flex flex-col items-center rounded-lg border bg-card p-6 text-center shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 glass-effect">
       <div className="mb-4 rounded-full bg-primary/10 p-3 transition-all duration-300 hover:scale-110 hover:bg-primary/20">
         {icon}
       </div>

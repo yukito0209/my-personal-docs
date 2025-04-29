@@ -36,9 +36,13 @@ export const baseOptions: BaseLayoutProps = {
   },
   links: [
     {
-      text: 'Documentation',
+      text: '文档',
       url: '/docs',
       active: 'nested-url',
+    },
+    {
+      text: '关于',
+      url: '/about',
     },
   ],
 };
