@@ -25,13 +25,13 @@ export default function EducationCard({
   detailText,
 }: EducationCardProps) {
   return (
-    <div className="rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg">
+    <div className="rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50">
       <div 
         className="cursor-pointer"
         onClick={() => window.open(schoolUrl, '_blank')}
       >
         <div className="flex items-center space-x-2">
-          <div className="h-8 w-8 flex items-center justify-center">
+          <div className="h-8 w-8 flex items-center justify-center transition-transform duration-300 hover:scale-110">
             <Image
               src={logo}
               alt={`${school} Logo`}
@@ -42,18 +42,18 @@ export default function EducationCard({
             />
           </div>
           <div>
-            <h3 className="font-medium">{school}</h3>
+            <h3 className="font-medium transition-colors duration-300 hover:text-primary">{school}</h3>
             <p className="text-sm text-muted-foreground">{department}</p>
           </div>
         </div>
         <div className="mt-4">
-          <p className="font-medium">{degree}</p>
+          <p className="font-medium transition-colors duration-300 hover:text-primary">{degree}</p>
           <p className="text-sm text-muted-foreground">{period}</p>
         </div>
       </div>
       <Link
         href={detailUrl}
-        className="mt-2 inline-block text-sm text-primary hover:underline"
+        className="mt-2 inline-block text-sm text-primary hover:text-primary/80 hover:underline transition-colors duration-300"
         target="_blank"
       >
         {detailText}

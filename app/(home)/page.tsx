@@ -8,7 +8,7 @@ import InterestsSection from './components/InterestCard';
 export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center p-4">
-      <div className="w-full max-w-2xl rounded-lg border bg-card p-6 shadow-sm">
+      <div className="w-full max-w-2xl rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg">
         <div className="flex flex-col items-center space-y-4">
           <Image
             src="https://avatars.githubusercontent.com/u/76610895?v=4"
@@ -24,7 +24,7 @@ export default function HomePage() {
           <div className="flex space-x-4">
             <Link
               href="https://github.com/yukito0209"
-              className="flex items-center text-muted-foreground hover:text-foreground"
+              className="flex items-center text-muted-foreground hover:text-foreground transition-colors duration-300"
               target="_blank"
             >
               <Github className="mr-2 h-5 w-5" />
@@ -32,7 +32,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="https://space.bilibili.com/13845177"
-              className="flex items-center text-muted-foreground hover:text-foreground"
+              className="flex items-center text-muted-foreground hover:text-foreground transition-colors duration-300"
               target="_blank"
             >
               <svg
@@ -81,7 +81,7 @@ export default function HomePage() {
           你可以访问{' '}
           <Link
             href="/docs"
-            className="text-foreground font-semibold underline"
+            className="text-foreground font-semibold underline hover:text-primary transition-colors duration-300"
           >
             /docs
           </Link>{' '}
