@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Github, Mail, Bell } from 'lucide-react';
+import { Github, Mail, Bell, Book, Camera, ArrowRight } from 'lucide-react';
 import { siBilibili } from 'simple-icons';
 import EducationCard from './components/EducationCard';
 import InterestsSection from './components/InterestCard';
@@ -98,17 +98,51 @@ export default function HomePage() {
 
             <InterestsSection />
             
-            <div className="mt-8 text-center">
-              <p className="text-muted-foreground">
-                你可以访问{' '}
-                <Link
-                  href="/docs"
-                  className="text-foreground font-semibold underline hover:text-primary transition-colors duration-300"
+            <div className="mt-8 w-full max-w-2xl">
+              <h2 className="mb-4 text-xl font-semibold">个人作品</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Link 
+                  href="/docs" 
+                  className="group rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 glass-effect"
                 >
-                  /docs
-                </Link>{' '}
-                查看文档。
-              </p>
+                  <div className="flex items-start space-x-4">
+                    <div className="p-3 rounded-full bg-primary/10 text-primary">
+                      <Book className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-lg mb-2 group-hover:text-primary transition-colors">技术文档</h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        记录我的学习笔记、技术心得和项目经验，包含前端开发、系统设计等多个主题。
+                      </p>
+                      <div className="flex items-center text-sm text-primary">
+                        <span className="group-hover:underline">浏览文档</span>
+                        <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link 
+                  href="/gallery" 
+                  className="group rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 glass-effect"
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="p-3 rounded-full bg-primary/10 text-primary">
+                      <Camera className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-lg mb-2 group-hover:text-primary transition-colors">摄影作品</h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        分享我的摄影作品集，记录生活中的美好瞬间，展现独特的视角和创作理念。
+                      </p>
+                      <div className="flex items-center text-sm text-primary">
+                        <span className="group-hover:underline">查看相册</span>
+                        <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             </div>
           </div>
 

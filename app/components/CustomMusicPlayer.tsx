@@ -1,58 +1,27 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music2, Disc } from 'lucide-react';
 import Image from 'next/image';
-
-interface Song {
-  title: string;
-  artist: string;
-  src: string;
-  coverUrl?: string;
-  album?: string;
-}
+import { useMusicPlayer } from '../contexts/MusicPlayerContext';
 
 export function CustomMusicPlayer() {
-  const [playlist, setPlaylist] = useState<Song[]>([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentSong, setCurrentSong] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.5);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const {
+    playlist,
+    currentSong,
+    isPlaying,
+    volume,
+    isMuted,
+    currentTime,
+    duration,
+    audioRef,
+    setCurrentSong,
+    setIsPlaying,
+    setVolume,
+    setIsMuted,
+  } = useMusicPlayer();
+
   const progressRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // 从 API 获取音乐文件列表
-    fetch('/api/music')
-      .then(res => res.json())
-      .then(data => {
-        setPlaylist(data.files);
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching music files:', error);
-        setIsLoading(false);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
-
-  // 监听当前歌曲变化
-  useEffect(() => {
-    if (audioRef.current && isPlaying) {
-      audioRef.current.play().catch(error => {
-        console.error('Error playing audio:', error);
-      });
-    }
-  }, [currentSong, isPlaying]);
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -69,13 +38,6 @@ export function CustomMusicPlayer() {
     if (audioRef.current) {
       audioRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-      setDuration(audioRef.current.duration);
     }
   };
 
@@ -104,17 +66,6 @@ export function CustomMusicPlayer() {
       setCurrentSong((prev) => (prev - 1 + playlist.length) % playlist.length);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center text-muted-foreground">
-          <Music2 className="h-8 w-8 mx-auto mb-2 animate-pulse" />
-          <p>正在加载音乐列表...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (playlist.length === 0) {
     return (
@@ -250,13 +201,6 @@ export function CustomMusicPlayer() {
           </div>
         </div>
       </div>
-
-      <audio
-        ref={audioRef}
-        src={currentTrack?.src}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={playNext}
-      />
     </div>
   );
 } 
