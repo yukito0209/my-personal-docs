@@ -30,7 +30,7 @@ export const baseOptions: BaseLayoutProps = {
             verticalAlign: 'middle' // 尝试让图片和文字垂直居中对齐
           }}
         />
-        Yukito (Kerwin Wang)
+        Yukito の 复式高层
       </>
     ),
   },
