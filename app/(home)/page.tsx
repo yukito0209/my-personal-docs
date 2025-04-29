@@ -34,7 +34,7 @@ export default function HomePage() {
                 />
                 <h1 className="text-2xl font-bold">Yukito (Kerwin Wang)</h1>
                 <p className="text-center text-muted-foreground">
-                  热爱编程的开发者，专注于前端开发和用户体验
+                  詩風禮月，心嶺意海。
                 </p>
                 <div className="flex space-x-4">
                   <Link
@@ -75,13 +75,13 @@ export default function HomePage() {
               <div className="grid gap-6 md:grid-cols-2">
                 <EducationCard
                   logo="/logos/cityu-logo.svg"
-                  school="香港城市大学(东莞)"
-                  department="商学院 | 资讯系统学系"
-                  degree="理学硕士 - 商务资讯系统 (MSc BIS)"
+                  school="香港城市大學(東莞)"
+                  department="商學院 | 資訊系統學系"
+                  degree="理學碩士 - 商務資訊系統 (MSc BIS)"
                   period="2024-2026"
-                  schoolUrl="https://www.cityu.edu.hk/"
+                  schoolUrl="https://www.cityu-dg.edu.cn/"
                   detailUrl="https://www.cb.cityu.edu.hk/is/postgraduate-degrees/taught-postgraduate/msc-business-information-systems"
-                  detailText="课程大纲"
+                  detailText="課程大綱"
                 />
                 <EducationCard
                   logo="/logos/nuist-logo.svg"
