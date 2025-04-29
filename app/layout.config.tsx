@@ -41,6 +41,10 @@ export const baseOptions: BaseLayoutProps = {
       active: 'nested-url',
     },
     {
+      text: '相册',
+      url: '/gallery',
+    },
+    {
       text: '关于',
       url: '/about',
     },
