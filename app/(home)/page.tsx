@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Github, Mail } from 'lucide-react';
+import { Github, Mail, Bell } from 'lucide-react';
 import { siBilibili } from 'simple-icons';
 import EducationCard from './components/EducationCard';
 import InterestsSection from './components/InterestCard';
@@ -13,11 +13,15 @@ export default function HomePage() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row gap-6 py-8">
           {/* 左侧音乐播放器 */}
-          <div className="w-full md:w-[300px] md:sticky md:top-4 md:self-start h-[400px]">
-            <CustomMusicPlayer />
+          <div className="w-full md:w-[300px] md:sticky md:top-4 md:self-start">
+            <div className="rounded-lg border bg-card shadow-sm glass-effect h-[600px]">
+              <div className="p-4 h-full">
+                <CustomMusicPlayer />
+              </div>
+            </div>
           </div>
 
-          {/* 右侧主要内容 */}
+          {/* 中间主要内容 */}
           <div className="flex-1 flex flex-col items-center">
             <div className="w-full max-w-2xl rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg glass-effect">
               <div className="flex flex-col items-center space-y-4">
@@ -105,6 +109,45 @@ export default function HomePage() {
                 </Link>{' '}
                 查看文档。
               </p>
+            </div>
+          </div>
+
+          {/* 右侧公告栏 */}
+          <div className="w-full md:w-[300px] md:sticky md:top-4 md:self-start">
+            <div className="rounded-lg border bg-card shadow-sm glass-effect h-[600px]">
+              <div className="p-4 h-full flex flex-col">
+                <div className="flex items-center space-x-2 mb-4">
+                  <Bell className="h-5 w-5 text-primary" />
+                  <h3 className="font-medium">最新公告</h3>
+                </div>
+                <div className="space-y-3 flex-1 overflow-y-auto">
+                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">🎉 网站更新</p>
+                    <p className="text-xs text-muted-foreground">新增音乐播放器功能，支持显示专辑封面和歌词。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2024-03-19</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">📚 文档系统</p>
+                    <p className="text-xs text-muted-foreground">完善了文档系统的搜索功能和导航结构。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2024-03-18</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">🌟 即将上线</p>
+                    <p className="text-xs text-muted-foreground">相册功能开发中，敬请期待。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2024-03-17</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">🔧 性能优化</p>
+                    <p className="text-xs text-muted-foreground">优化了网站加载速度和响应性能。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2024-03-16</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">🎨 界面更新</p>
+                    <p className="text-xs text-muted-foreground">优化了深色模式下的显示效果。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2024-03-15</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
