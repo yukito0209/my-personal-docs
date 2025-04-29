@@ -29,6 +29,22 @@ const config = {
     dangerouslyAllowSVG: true,
     // 如果 remotePatterns 不适用于你的 Next.js 版本，可以尝试 domains:
     // domains: ['img.shields.io', 'avatars.githubusercontent.com'],
+    unoptimized: true, // 允许加载本地图片
+  },
+  // 配置 webpack 以支持音频文件
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(mp3|wav|ogg|flac)$/i,
+      use: {
+        loader: 'file-loader',
+        options: {
+          publicPath: '/_next/static/media',
+          outputPath: 'static/media',
+          name: '[name].[hash].[ext]',
+        },
+      },
+    });
+    return config;
   },
 };
 
