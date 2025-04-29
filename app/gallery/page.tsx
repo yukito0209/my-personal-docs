@@ -1,18 +1,113 @@
 import Image from 'next/image';
-import { Camera } from 'lucide-react';
+import { Camera, Aperture, ArrowRight } from 'lucide-react';
 import { PhotoCard } from './components/PhotoCard';
 import { getPhotos } from './utils/photos';
+import Link from 'next/link';
 
 function GalleryHeader() {
   return (
-    <div className="mb-8 text-center">
-      <div className="inline-flex items-center justify-center rounded-full bg-primary/10 p-3">
-        <Camera className="h-6 w-6 text-primary" />
+    <div className="mb-8">
+      <div className="text-center">
+        <div className="inline-flex items-center justify-center rounded-full bg-primary/10 p-3">
+          <Camera className="h-6 w-6 text-primary" />
+        </div>
+        <h1 className="mt-4 text-2xl font-bold">我的相册</h1>
+        <p className="mt-2 text-muted-foreground">
+          记录生活中的美好瞬间
+        </p>
       </div>
-      <h1 className="mt-4 text-2xl font-bold">我的相册</h1>
-      <p className="mt-2 text-muted-foreground">
-        记录生活中的美好瞬间
-      </p>
+      
+      <div className="mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link
+            href="https://www.sonystyle.com.cn/products/ilc/ilce_7cm2/ilce_7cm2_feature.html"
+            target="_blank"
+            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50"
+          >
+            <div className="flex items-start space-x-4">
+              <div className="p-2 rounded-full bg-primary/10 text-primary">
+                <Camera className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-base mb-1 group-hover:text-primary transition-colors">全画幅无反相机</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Sony Alpha 7C II
+                </p>
+                <div className="flex items-center text-sm text-primary">
+                  <span className="group-hover:underline">查看详情</span>
+                  <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="http://sigma-photo.com.cn/lenses/overview?id=24"
+            target="_blank"
+            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50"
+          >
+            <div className="flex items-start space-x-4">
+              <div className="p-2 rounded-full bg-primary/10 text-primary">
+                <Aperture className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-base mb-1 group-hover:text-primary transition-colors">大光圈人像定焦镜头</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Sigma 85mm F1.4 DG DN | Art
+                </p>
+                <div className="flex items-center text-sm text-primary">
+                  <span className="group-hover:underline">查看详情</span>
+                  <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="http://sigma-photo.com.cn/lenses/overview?id=189"
+            target="_blank"
+            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50"
+          >
+            <div className="flex items-start space-x-4">
+              <div className="p-2 rounded-full bg-primary/10 text-primary">
+                <Aperture className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-base mb-1 group-hover:text-primary transition-colors">标准变焦镜头</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Sigma 24-70mm F2.8 DG DN II | Art
+                </p>
+                <div className="flex items-center text-sm text-primary">
+                  <span className="group-hover:underline">查看详情</span>
+                  <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="https://www.sonystyle.com.cn/products/lenses/sel40f25g/sel40f25g_feature.html"
+            target="_blank"
+            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50"
+          >
+            <div className="flex items-start space-x-4">
+              <div className="p-2 rounded-full bg-primary/10 text-primary">
+                <Aperture className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-base mb-1 group-hover:text-primary transition-colors">轻便定焦镜头</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Sony FE 40mm F2.5 G
+                </p>
+                <div className="flex items-center text-sm text-primary">
+                  <span className="group-hover:underline">查看详情</span>
+                  <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
