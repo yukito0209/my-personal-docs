@@ -16,6 +16,14 @@ const config = {
         protocol: 'https',
         hostname: 'avatars.githubusercontent.com', // 允许 GitHub 头像
       },
+      {
+        protocol: 'https',
+        hostname: 'www.cityu.edu.hk', // 允许香港城市大学域名
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.nuist.edu.cn', // 允许南京信息工程大学域名
+      },
       // 如果还有其他外部图片域名，继续在这里添加
     ],
     dangerouslyAllowSVG: true,
