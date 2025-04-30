@@ -5,7 +5,7 @@ export async function fetchFromS3(prefix: string) {
   try {
     const command = new ListObjectsV2Command({
       Bucket: BUCKET_NAME,
-      Prefix: prefix
+      Prefix: 'music/albums/'
     });
 
     const response = await s3Client.send(command);
@@ -14,4 +14,4 @@ export async function fetchFromS3(prefix: string) {
     console.error('Error fetching from S3:', error);
     throw error;
   }
-} 
+}

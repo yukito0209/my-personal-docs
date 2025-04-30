@@ -1,28 +1,24 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { config } from '../config';
 
-const CDN_BASE_URL = config.cdn.baseUrl;
+const CDN_BASE_URL = config.cdn.baseUrl; // 直接使用配置中的完整CDN地址
 
 // S3 客户端配置
 export const s3Client = new S3Client({
-  region: config.s3.region,
+  region: 'auto',
   endpoint: config.s3.endpoint,
+  tls: true,
   credentials: {
     accessKeyId: config.s3.accessKeyId,
     secretAccessKey: config.s3.secretAccessKey
   },
   forcePathStyle: true,
-  // 禁用默认的代理配置
-  requestHandler: {
-    httpOptions: {
-      proxy: false
-    }
-  }
+  // 移除requestHandler配置节
 });
 
 // SFTP配置
 export const SFTP_CONFIG = {
-  host: new URL(config.s3.endpoint).hostname,
+  host: 'cn-nb1.rains3.com',
   port: 8022,
   username: config.s3.accessKeyId,
   password: config.s3.secretAccessKey
@@ -41,4 +37,4 @@ export function getLogoUrl(path: string): string {
 }
 
 // 获取桶名称
-export const BUCKET_NAME = config.s3.bucketName; 
+export const BUCKET_NAME = config.s3.bucketName;
