@@ -123,10 +123,10 @@ function MasonryGrid({ children }: { children: React.ReactNode }) {
 
 export default async function GalleryPage() {
   try {
-    // 直接从S3获取照片
+    // 直接从公共访问 URL 获取照片
     const files = await fetchFromS3('photos/gallery/');
     const photos = files.map(file => ({
-      src: file.Key?.replace('photos/gallery/', '') || '',
+      src: file.Key || '',
       alt: file.Key?.split('/').pop()?.split('.')[0] || ''
     })).filter(photo => photo.src !== '').map(photo => ({
       ...photo,

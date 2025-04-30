@@ -50,7 +50,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
               className={`object-cover transition-all duration-300 ${
                 isLoading ? 'opacity-0' : 'opacity-100 group-hover:scale-105'
               }`}
-              onLoadingComplete={() => setIsLoading(false)}
+              onLoad={() => setIsLoading(false)}
             />
           </div>
           <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
