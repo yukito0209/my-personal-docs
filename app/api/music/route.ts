@@ -34,6 +34,44 @@ async function extractCoverFromFlac(filePath: string, fileName: string): Promise
   }
 }
 
+async function getMusicMetadata(filePath: string, fileName: string): Promise<MusicInfo> {
+  try {
+    const metadata = await mm.parseFile(filePath);
+    const common = metadata.common;
+    
+    // 从文件名中提取序号（如果存在）
+    const numberMatch = fileName.match(/^(\d+)-/);
+    const number = numberMatch ? numberMatch[1] : '';
+    
+    // 获取基本信息，使用元数据或文件名作为后备
+    const fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
+    const fileNameWithoutNumber = fileNameWithoutExt.replace(/^\d+-/, '');
+    
+    // 处理特殊版本标记
+    const versionMatch = fileNameWithoutNumber.match(/\((.*?)\)/);
+    const version = versionMatch ? ` (${versionMatch[1]})` : '';
+    
+    return {
+      title: (common.title || fileNameWithoutNumber.replace(/\s*\(.*?\)$/, '')) + version,
+      artist: common.artist || common.albumartist || '未知艺术家',
+      album: common.album || '未知专辑',
+      src: `/music/${fileName}`,
+      coverUrl: undefined // 将由调用方设置
+    };
+  } catch (error) {
+    console.error('Error reading metadata:', error);
+    // 如果无法读取元数据，使用文件名作为后备
+    const fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
+    return {
+      title: fileNameWithoutExt.replace(/^\d+-/, ''),
+      artist: '未知艺术家',
+      album: '未知专辑',
+      src: `/music/${fileName}`,
+      coverUrl: undefined
+    };
+  }
+}
+
 export async function GET() {
   try {
     const musicDir = path.join(process.cwd(), 'public', 'music');
@@ -42,31 +80,22 @@ export async function GET() {
     
     const musicFiles = await Promise.all(files.map(async file => {
       const filePath = path.join(musicDir, file);
-      const fileNameWithoutExt = file.substring(0, file.lastIndexOf('.'));
-      const parts = fileNameWithoutExt.split(' - ');
-      const artist = parts.length > 1 ? parts[0] : '未知艺术家';
-      const songTitle = parts.length > 1 ? parts[1].replace('(MyGO!!!!! ver.)', '').trim() : fileNameWithoutExt;
+      const musicInfo = await getMusicMetadata(filePath, file);
       
       // 检查是否存在封面
+      const fileNameWithoutExt = file.substring(0, file.lastIndexOf('.'));
       const coverFileName = `${fileNameWithoutExt}_cover.jpg`;
       const coverPath = path.join(musicDir, coverFileName);
       const hasCover = fs.existsSync(coverPath);
       
       // 如果没有封面且是 FLAC 文件，尝试提取
-      let coverUrl: string | undefined;
       if (hasCover) {
-        coverUrl = `/music/${coverFileName}`;
+        musicInfo.coverUrl = `/music/${coverFileName}`;
       } else if (file.endsWith('.flac')) {
-        coverUrl = await extractCoverFromFlac(filePath, file);
+        musicInfo.coverUrl = await extractCoverFromFlac(filePath, file);
       }
       
-      return {
-        title: songTitle,
-        artist,
-        src: `/music/${file}`,
-        coverUrl,
-        album: parts.length > 2 ? parts[2] : '未知专辑'
-      };
+      return musicInfo;
     }));
 
     return NextResponse.json({ files: musicFiles });
