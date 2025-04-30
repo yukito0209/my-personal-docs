@@ -9,6 +9,8 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.799.0",
+    "@types/ssh2": "^1.15.5",
     "fumadocs-core": "15.2.12",
     "fumadocs-mdx": "11.6.1",
     "fumadocs-ui": "15.2.12",
@@ -17,7 +19,8 @@
     "next": "15.3.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "simple-icons": "^14.12.3"
+    "simple-icons": "^14.12.3",
+    "ssh2": "^1.16.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.4",

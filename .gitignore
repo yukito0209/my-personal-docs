@@ -39,3 +39,22 @@ next-env.d.ts
 /public/photos/*
 !/public/music/.gitkeep
 !/public/photos/.gitkeep
+
+# IDE 相关
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 操作系统相关
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp

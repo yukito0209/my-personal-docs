@@ -1,6 +1,8 @@
 'use client';
 
 import { createContext, useContext, useState, useRef, useEffect } from 'react';
+import { getMusicUrl } from '@/app/utils/oss';
+import { fetchFromS3 } from '@/app/utils/api';
 
 interface Song {
   title: string;
@@ -42,14 +44,27 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
 
   // 初始化音乐列表
   useEffect(() => {
-    fetch('/api/music')
-      .then(res => res.json())
-      .then(data => {
-        setPlaylist(data.files);
-      })
-      .catch(error => {
-        console.error('Error fetching music files:', error);
-      });
+    async function loadMusic() {
+      try {
+        const files = await fetchFromS3('music/albums/');
+        const musicFiles = files.map(file => {
+          const filename = file.Key?.split('/').pop() || '';
+          const title = filename.split('.')[0];
+          return {
+            title,
+            artist: '未知艺术家',
+            src: getMusicUrl(filename),
+            album: '未知专辑'
+          };
+        }).filter(music => music.src !== '');
+        
+        setPlaylist(musicFiles);
+      } catch (error) {
+        console.error('Error loading music:', error);
+      }
+    }
+
+    loadMusic();
   }, []);
 
   // 监听音量变化

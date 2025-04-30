@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import { Camera, Aperture, ArrowRight } from 'lucide-react';
 import { PhotoCard } from './components/PhotoCard';
-import { getPhotos } from './utils/photos';
+import { fetchFromS3 } from '@/app/utils/api';
+import { getPhotoUrl } from '@/app/utils/oss';
 import Link from 'next/link';
 
 function GalleryHeader() {
@@ -120,20 +121,37 @@ function MasonryGrid({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function GalleryPage() {
-  // 获取所有照片
-  const photos = getPhotos();
+export default async function GalleryPage() {
+  try {
+    // 直接从S3获取照片
+    const files = await fetchFromS3('photos/gallery/');
+    const photos = files.map(file => ({
+      src: file.Key?.replace('photos/gallery/', '') || '',
+      alt: file.Key?.split('/').pop()?.split('.')[0] || ''
+    })).filter(photo => photo.src !== '').map(photo => ({
+      ...photo,
+      src: getPhotoUrl(photo.src)
+    }));
 
-  return (
-    <main className="flex flex-col items-center p-4 md:p-8">
-      <div className="w-full max-w-7xl">
-        <GalleryHeader />
-        <MasonryGrid>
-          {photos.map((photo, index) => (
-            <PhotoCard key={photo.src} photo={photo} />
-          ))}
-        </MasonryGrid>
+    return (
+      <main className="flex flex-col items-center p-4 md:p-8">
+        <div className="w-full max-w-7xl">
+          <GalleryHeader />
+          <MasonryGrid>
+            {photos.map((photo, index) => (
+              <PhotoCard key={photo.src} photo={photo} />
+            ))}
+          </MasonryGrid>
+        </div>
+      </main>
+    );
+  } catch (error) {
+    console.error('Error loading gallery:', error);
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh]">
+        <h2 className="text-xl font-semibold mb-2">加载相册失败</h2>
+        <p className="text-muted-foreground">请稍后重试</p>
       </div>
-    </main>
-  );
+    );
+  }
 } 

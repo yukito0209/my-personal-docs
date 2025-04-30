@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { getPhotoUrl } from '@/app/utils/oss';
 
 interface Photo {
   src: string;
@@ -14,15 +15,16 @@ export function PhotoCard({ photo }: { photo: Photo }) {
   const [aspectRatio, setAspectRatio] = useState('1');
   const [isLoading, setIsLoading] = useState(true);
   const imageRef = useRef<HTMLImageElement>(null);
+  const photoUrl = getPhotoUrl(photo.src);
 
   useEffect(() => {
     const img = new window.Image();
-    img.src = photo.src;
+    img.src = photoUrl;
     img.onload = () => {
       setAspectRatio(`${img.width}/${img.height}`);
       setIsLoading(false);
     };
-  }, [photo.src]);
+  }, [photoUrl]);
 
   return (
     <>
@@ -41,7 +43,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
             )}
             <Image
               ref={imageRef}
-              src={photo.src}
+              src={photoUrl}
               alt={photo.alt}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -71,7 +73,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
           <div className="relative w-full h-full p-4">
             <div className="relative w-full h-full">
               <Image
-                src={photo.src}
+                src={photoUrl}
                 alt={photo.alt}
                 fill
                 sizes="100vw"

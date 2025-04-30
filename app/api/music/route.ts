@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-import * as mm from 'music-metadata';
-import sharp from 'sharp';
+import { getMusicUrl } from '@/app/utils/oss';
+import { listMusic } from '@/app/utils/s3';
 
 interface MusicInfo {
   title: string;
@@ -12,66 +10,21 @@ interface MusicInfo {
   album?: string;
 }
 
-async function extractMusicMetadata(filePath: string, fileName: string): Promise<MusicInfo> {
-  try {
-    const buffer = await fs.readFile(filePath);
-    const metadata = await mm.parseBuffer(buffer);
-    const picture = metadata.common.picture?.[0];
-    let coverUrl: string | undefined;
-
-    // 如果音乐文件中包含封面图片
-    if (picture) {
-      const coverFileName = `${path.basename(fileName, path.extname(fileName))}_cover.jpg`;
-      const coverPath = path.join(process.cwd(), 'public', 'music', coverFileName);
-      
-      await fs.writeFile(coverPath, picture.data);
-      coverUrl = `/music/${coverFileName}`;
-    }
-
-    return {
-      title: metadata.common.title || path.basename(fileName, path.extname(fileName)),
-      artist: metadata.common.artist || '未知艺术家',
-      album: metadata.common.album,
-      src: `/music/${fileName}`,
-      coverUrl
-    };
-  } catch (error) {
-    console.error('Error extracting metadata:', error);
-    // 如果无法提取元数据，返回基本信息
-    return {
-      title: path.basename(fileName, path.extname(fileName)),
-      artist: '未知艺术家',
-      src: `/music/${fileName}`
-    };
-  }
-}
-
 export async function GET() {
   try {
-    const musicDir = path.join(process.cwd(), 'public', 'music');
+    // 从S3获取音乐列表
+    const musicFiles = await listMusic();
     
-    // 确保目录存在
-    try {
-      await fs.access(musicDir);
-    } catch {
-      return NextResponse.json({ files: [] });
-    }
+    // 处理音乐URL
+    const processedMusicList = musicFiles.map(music => ({
+      ...music,
+      src: getMusicUrl(music.src),
+      coverUrl: music.coverUrl ? getMusicUrl(music.coverUrl) : undefined
+    }));
 
-    const files = await fs.readdir(musicDir);
-    
-    // 过滤音乐文件并提取元数据
-    const musicFiles = await Promise.all(
-      files
-        .filter(file => /\.(mp3|wav|ogg|flac)$/i.test(file))
-        .map(async file => {
-          const filePath = path.join(musicDir, file);
-          return await extractMusicMetadata(filePath, file);
-        })
-    );
-
-    return NextResponse.json({ files: musicFiles });
+    return NextResponse.json({ files: processedMusicList });
   } catch (error) {
-    console.error('Error reading music directory:', error);
-    return NextResponse.json({ files: [] });
+    console.error('Error fetching music files:', error);
+    return NextResponse.json({ error: 'Failed to fetch music files' }, { status: 500 });
   }
 } 
