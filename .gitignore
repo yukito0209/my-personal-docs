@@ -40,6 +40,10 @@ next-env.d.ts
 !/public/music/.gitkeep
 !/public/photos/.gitkeep
 
+# Keep directory structure
+!public/music/
+!public/photos/
+
 # IDE 相关
 .idea/
 .vscode/
