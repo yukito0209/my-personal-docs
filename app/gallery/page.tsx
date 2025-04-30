@@ -1,9 +1,9 @@
 import Image from 'next/image';
 import { Camera, Aperture, ArrowRight } from 'lucide-react';
 import { PhotoCard } from './components/PhotoCard';
-import { fetchFromS3 } from '@/app/utils/api';
-import { getPhotoUrl } from '@/app/utils/oss';
 import Link from 'next/link';
+import fs from 'fs';
+import path from 'path';
 
 function GalleryHeader() {
   return (
@@ -123,14 +123,13 @@ function MasonryGrid({ children }: { children: React.ReactNode }) {
 
 export default async function GalleryPage() {
   try {
-    // 直接从公共访问 URL 获取照片
-    const files = await fetchFromS3('photos/gallery/');
+    const photosDir = path.join(process.cwd(), 'public', 'photos');
+    const files = fs.readdirSync(photosDir)
+      .filter(file => !file.startsWith('.') && (file.toLowerCase().endsWith('.jpg') || file.toLowerCase().endsWith('.png')));
+    
     const photos = files.map(file => ({
-      src: file.Key || '',
-      alt: file.Key?.split('/').pop()?.split('.')[0] || ''
-    })).filter(photo => photo.src !== '').map(photo => ({
-      ...photo,
-      src: getPhotoUrl(photo.src)
+      src: `/photos/${file}`,
+      alt: file.split('.')[0]
     }));
 
     return (

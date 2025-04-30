@@ -24,8 +24,13 @@ const config = {
         protocol: 'https',
         hostname: 'www.nuist.edu.cn', // 允许南京信息工程大学域名
       },
+      {
+        protocol: 'https',
+        hostname: 'your-domain-assets.cn-nb1.rains3.com', // 允许 S3 域名
+      },
       // 如果还有其他外部图片域名，继续在这里添加
     ],
+    domains: ['your-domain-assets.cn-nb1.rains3.com'], // 添加 domains 配置作为备选
     dangerouslyAllowSVG: true,
     // 如果 remotePatterns 不适用于你的 Next.js 版本，可以尝试 domains:
     // domains: ['img.shields.io', 'avatars.githubusercontent.com'],

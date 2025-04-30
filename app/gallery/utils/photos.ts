@@ -1,5 +1,5 @@
-import { getPhotoUrl } from '@/app/utils/oss';
-import { listPhotos } from '@/app/utils/s3';
+import fs from 'fs';
+import path from 'path';
 
 export interface Photo {
   src: string;
@@ -8,13 +8,13 @@ export interface Photo {
 
 export async function getPhotos(): Promise<Photo[]> {
   try {
-    // 从S3获取照片列表
-    const photos = await listPhotos();
+    const photosDir = path.join(process.cwd(), 'public', 'photos');
+    const files = fs.readdirSync(photosDir)
+      .filter(file => !file.startsWith('.') && (file.toLowerCase().endsWith('.jpg') || file.toLowerCase().endsWith('.png')));
     
-    // 处理照片URL
-    return photos.map(photo => ({
-      ...photo,
-      src: getPhotoUrl(photo.src)
+    return files.map(file => ({
+      src: `/photos/${file}`,
+      alt: file.split('.')[0]
     }));
   } catch (error) {
     console.error('Error fetching photos:', error);

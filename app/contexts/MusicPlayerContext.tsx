@@ -1,8 +1,6 @@
 'use client';
 
 import { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { getMusicUrl } from '@/app/utils/oss';
-import { fetchFromS3 } from '@/app/utils/api';
 
 interface Song {
   title: string;
@@ -20,6 +18,8 @@ interface MusicPlayerContextType {
   isMuted: boolean;
   currentTime: number;
   duration: number;
+  isLoading: boolean;
+  error: MediaError | null;
   audioRef: React.RefObject<HTMLAudioElement | null>;
   setPlaylist: (songs: Song[]) => void;
   setCurrentSong: (indexOrUpdater: number | ((prev: number) => number)) => void;
@@ -40,25 +40,27 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<MediaError | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // 初始化音乐列表
   useEffect(() => {
     async function loadMusic() {
       try {
-        const files = await fetchFromS3('music/albums/');
-        const musicFiles = files.map(file => {
-          const filename = file.Key?.split('/').pop() || '';
-          const title = filename.split('.')[0];
-          return {
-            title,
-            artist: '未知艺术家',
-            src: getMusicUrl(filename),
-            album: '未知专辑'
-          };
-        }).filter(music => music.src !== '');
-        
-        setPlaylist(musicFiles);
+        const response = await fetch('/api/music');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.files) {
+          const processedFiles = data.files.map((file: Song) => ({
+            ...file,
+            src: file.src
+          }));
+          console.log('Processed music files:', processedFiles);
+          setPlaylist(processedFiles);
+        }
       } catch (error) {
         console.error('Error loading music:', error);
       }
@@ -67,21 +69,146 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     loadMusic();
   }, []);
 
+  // 监听音频状态变化
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    const audio = audioRef.current;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+      setCurrentTime(audio.currentTime);
+      setIsLoading(false);
+    };
+
+    const handleEnded = () => {
+      if (playlist.length > 0) {
+        setCurrentSong((prev) => (prev + 1) % playlist.length);
+      }
+    };
+
+    const handleLoadStart = () => {
+      setIsLoading(true);
+    };
+
+    const handleCanPlay = () => {
+      setIsLoading(false);
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('playing', () => setIsLoading(false));
+    audio.addEventListener('waiting', () => setIsLoading(true));
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('playing', () => setIsLoading(false));
+      audio.removeEventListener('waiting', () => setIsLoading(true));
+    };
+  }, [playlist.length]);
+
   // 监听音量变化
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
+    if (!audioRef.current) return;
+    audioRef.current.volume = isMuted ? 0 : volume;
+  }, [volume, isMuted]);
 
   // 监听歌曲变化
   useEffect(() => {
-    if (audioRef.current && isPlaying) {
-      audioRef.current.play().catch(error => {
-        console.error('Error playing audio:', error);
-      });
+    if (!audioRef.current || !playlist[currentSong]) return;
+
+    const audio = audioRef.current;
+    const currentTrack = playlist[currentSong];
+
+    const loadAndPlay = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        audio.src = currentTrack.src;
+        await audio.load();
+        
+        if (isPlaying) {
+          try {
+            await audio.play();
+          } catch (error) {
+            console.error('Error playing audio:', error);
+            setIsPlaying(false);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading audio:', error);
+        setIsPlaying(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAndPlay();
+  }, [currentSong, playlist]);
+
+  // 监听播放状态变化
+  useEffect(() => {
+    if (!audioRef.current) return;
+    
+    const audio = audioRef.current;
+    
+    if (isPlaying) {
+      // 避免重复播放导致的错误
+      if (audio.paused) {
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.error('Error on auto-play:', error);
+            setIsPlaying(false);
+          });
+        }
+      }
+    } else {
+      // 避免重复暂停导致的错误
+      if (!audio.paused) {
+        audio.pause();
+      }
     }
-  }, [currentSong, isPlaying]);
+  }, [isPlaying]);
+
+  // 添加音频错误处理
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    const audio = audioRef.current;
+    const handleError = (event: Event) => {
+      const mediaError = audio.error;
+      setError(mediaError);
+      console.error('Audio error:', {
+        code: mediaError?.code,
+        message: mediaError?.message,
+        src: audio.src,
+        readyState: audio.readyState,
+        networkState: audio.networkState,
+        currentTime: audio.currentTime,
+        duration: audio.duration,
+        paused: audio.paused,
+        ended: audio.ended,
+        error: mediaError
+      });
+      setIsPlaying(false);
+      setIsLoading(false);
+    };
+
+    audio.addEventListener('error', handleError);
+    return () => audio.removeEventListener('error', handleError);
+  }, []);
 
   const value = {
     playlist,
@@ -91,6 +218,8 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     isMuted,
     currentTime,
     duration,
+    isLoading,
+    error,
     audioRef,
     setPlaylist,
     setCurrentSong,
@@ -106,16 +235,27 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
       {children}
       <audio
         ref={audioRef}
-        src={playlist[currentSong]?.src}
+        preload="auto"
         onTimeUpdate={() => {
           if (audioRef.current) {
             setCurrentTime(audioRef.current.currentTime);
+          }
+        }}
+        onLoadedMetadata={() => {
+          if (audioRef.current) {
             setDuration(audioRef.current.duration);
           }
         }}
         onEnded={() => {
           if (playlist.length > 0) {
             setCurrentSong((prev) => (prev + 1) % playlist.length);
+          }
+        }}
+        onError={() => {
+          if (audioRef.current) {
+            setError(audioRef.current.error);
+            setIsPlaying(false);
+            setIsLoading(false);
           }
         }}
       />
@@ -129,4 +269,28 @@ export function useMusicPlayer() {
     throw new Error('useMusicPlayer must be used within a MusicPlayerProvider');
   }
   return context;
+}
+
+// 添加封面 URL 验证函数
+async function validateCoverUrl(urls: string[]): Promise<string | undefined> {
+  try {
+    // 尝试所有可能的 URL
+    for (const url of urls) {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
+        if (response.ok) {
+          console.log(`Found valid cover image at ${url}`);
+          return url;
+        }
+      } catch (error) {
+        console.warn(`Failed to check URL ${url}:`, error);
+        continue;
+      }
+    }
+    console.warn(`No valid cover image found in URLs:`, urls);
+    return undefined;
+  } catch (error) {
+    console.error(`Error validating cover URLs:`, error);
+    return undefined;
+  }
 } 
