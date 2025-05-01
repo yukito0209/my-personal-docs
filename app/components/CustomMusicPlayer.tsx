@@ -264,7 +264,9 @@ export function CustomMusicPlayer() {
                   alt={`${currentTrack.title} 封面`}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className={`object-cover transition-opacity duration-300 ${coverLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  className={`object-cover ${coverLoaded ? 'opacity-100' : 'opacity-0'} 
+                             transition-all duration-300 ease-in-out 
+                             group-hover:scale-105 group-hover:brightness-110`}
                   priority
                   unoptimized
                   onError={() => setCoverLoaded(true)} 

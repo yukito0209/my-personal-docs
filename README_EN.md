@@ -20,6 +20,7 @@ A modern personal homepage and documentation system built with Next.js and Fumad
 - Playback controls (play/pause, previous/next)
 - Volume control
 - Progress bar control
+- Support for MP3, WAV, OGG, FLAC formats
 
 ### 📚 Documentation System
 - Fumadocs-based document management
@@ -31,6 +32,7 @@ A modern personal homepage and documentation system built with Next.js and Fumad
 - Waterfall layout display
 - High-resolution image support
 - Responsive design
+- Image lazy loading
 
 ## 🛠️ Tech Stack
 
@@ -51,11 +53,14 @@ my-personal-docs/
 │   ├── docs/              # Documentation system
 │   ├── gallery/           # Gallery feature
 │   └── components/        # Shared components
+├── content/               # Content files
+│   └── docs/              # Documentation content
 ├── public/                # Static assets
 │   ├── music/             # Music files
 │   ├── photos/            # Image files
 │   └── logos/             # Logo files
-└── lib/                   # Utility functions and configurations
+├── lib/                   # Utility functions and configurations
+└── .source/               # Source files directory
 ```
 
 ## 🚀 Quick Start
@@ -111,22 +116,25 @@ Place image files in the `public/photos` directory. It's recommended to compress
 
 ### Documentation
 
-Documentation uses MDX format and should be placed in the `docs` directory.
+Documentation uses MDX format and should be placed in the `content/docs` directory.
 
 ## 📝 Development Notes
 
 1. Image Optimization
    - Use Next.js Image component for optimization
    - Consider using CDN for large images
+   - Implement image lazy loading
 
 2. Performance Optimization
    - Proper component splitting
    - Use React.memo() for render optimization
    - Compress images and audio files appropriately
+   - Use Next.js Turbo mode for development
 
 3. Security
    - Add proper validation to API routes
    - Avoid exposing sensitive information
+   - Use environment variables for sensitive configurations
 
 ## 📄 License
 
