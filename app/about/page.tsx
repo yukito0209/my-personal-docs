@@ -3,7 +3,7 @@
 import { Github, Mail } from 'lucide-react';
 import Link from 'next/link';
 import Footer from '@/app/components/Footer';
-import { siBilibili } from 'simple-icons/icons';
+import { siBilibili, siAfdian } from 'simple-icons/icons';
 
 export default function AboutPage() {
   return (
@@ -45,7 +45,8 @@ export default function AboutPage() {
               <h2 className="text-xl font-semibold mb-4">特别鸣谢</h2>
               <div className="bg-card p-6 rounded-lg border">
                 <p className="text-muted-foreground mb-4">
-                  本网站基于 Fumadocs 模板构建。Fumadocs 是一个优秀的文档框架，提供了美观的界面和强大的功能。
+                  本网站基于 Fumadocs 模板构建。Fumadocs 是一个优秀的文档框架，提供了针对 MDX 文档管理的强大支持，但缺少主页面和其他构建个人网站的必要模块。
+                  因此，本网站在 Fumadocs 的基础上，添加了个人主页、音乐播放器、公告栏和相册等功能，并进行了样式调整和优化。
                   在此特别感谢 Fumadocs 的开发者和贡献者们为开源社区做出的贡献。
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -63,6 +64,39 @@ export default function AboutPage() {
                   >
                     <Github className="mr-2 h-4 w-4" />
                     Fumadocs GitHub
+                  </Link>
+                </div>
+              </div>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">支持本站</h2>
+              <div className="bg-card p-6 rounded-lg border">
+                <p className="text-muted-foreground mb-4">
+                  如果你喜欢这个网站，欢迎通过以下方式支持我继续开发和维护。你的支持将帮助我持续改进网站，添加更多有趣的功能。
+                </p>
+                <div className="flex justify-center">
+                  <Link
+                    href="https://afdian.net/@yukito0209"
+                    target="_blank"
+                    className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50 w-full max-w-md"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative flex items-center justify-center space-x-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+                        <svg
+                          className="h-9 w-9 text-primary"
+                          role="img"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          dangerouslySetInnerHTML={{ __html: siAfdian.svg }}
+                        />
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <p className="font-medium group-hover:text-primary transition-colors duration-300">爱发电</p>
+                        <p className="text-sm text-muted-foreground group-hover:text-primary/70 transition-colors duration-300">支持我的创作</p>
+                      </div>
+                    </div>
                   </Link>
                 </div>
               </div>
