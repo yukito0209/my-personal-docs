@@ -1,4 +1,6 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import { BookText, Image as ImageIcon, Info } from 'lucide-react';
+import React from 'react';
 
 /**
  * Shared layout configurations
@@ -25,7 +27,7 @@ export const baseOptions: BaseLayoutProps = {
           width={24} // 保持和原来 svg 一致的宽度
           height={24} // 保持和原来 svg 一致的高度
           style={{
-            // marginRight: '8px', // 在头像和文字之间添加一些间距
+            marginRight: '8px',
             borderRadius: '50%', // 使图片呈圆形，更像头像
             verticalAlign: 'middle' // 尝试让图片和文字垂直居中对齐
           }}
@@ -36,16 +38,31 @@ export const baseOptions: BaseLayoutProps = {
   },
   links: [
     {
-      text: '文档',
+      text: (
+        <>
+          <BookText className="mr-1.2 h-4 w-4" />
+          文档
+        </>
+      ),
       url: '/docs',
       active: 'nested-url',
     },
     {
-      text: '相册',
+      text: (
+        <>
+          <ImageIcon className="mr-1.2 h-4 w-4" />
+          相册
+        </>
+      ),
       url: '/gallery',
     },
     {
-      text: '关于',
+      text: (
+        <>
+          <Info className="mr-1.2 h-4 w-4" />
+          关于
+        </>
+      ),
       url: '/about',
     },
   ],

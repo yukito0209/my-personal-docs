@@ -31,13 +31,12 @@ export default function EducationCard({
         onClick={() => window.open(schoolUrl, '_blank')}
       >
         <div className="flex items-center space-x-2">
-          <div className="h-8 w-8 flex items-center justify-center transition-transform duration-300 hover:scale-110">
+          <div className="flex items-center justify-center transition-transform duration-300 hover:scale-110">
             <Image
               src={logo}
               alt={`${school} Logo`}
               width={32}
               height={32}
-              className="h-8 w-8"
               priority
             />
           </div>

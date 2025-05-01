@@ -1,9 +1,17 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music2, Disc, AlertCircle, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
-import { useMusicPlayer } from '../contexts/MusicPlayerContext';
+import { useMusicPlayer } from '../contexts/MusicPlayerContext'; // Use the context hook
+
+interface Song {
+  title: string;
+  artist: string;
+  src: string;
+  coverUrl?: string;
+  album?: string;
+}
 
 // 简单错误边界组件
 function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
@@ -25,10 +33,26 @@ function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetError
   );
 }
 
+// Memoized 组件用于显示歌曲信息
+const SongInfoDisplay = React.memo(({ title, artist, album }: { title?: string, artist?: string, album?: string }) => {
+  console.log("Rendering SongInfoDisplay"); // 添加日志检查渲染
+  return (
+    <div className="text-center space-y-1">
+      <h3 className="font-medium text-lg line-clamp-1">{title || '未知歌曲'}</h3>
+      <p className="text-sm text-muted-foreground line-clamp-1">
+        {artist || '未知艺术家'}
+        {album && ` · ${album}`}
+      </p>
+    </div>
+  );
+});
+SongInfoDisplay.displayName = 'SongInfoDisplay'; // 设置 displayName
+
 export function CustomMusicPlayer() {
+  // --- Get state and controls from Context ---
   const {
     playlist,
-    currentSong,
+    // currentSongIndex, // No longer needed directly if currentTrack is provided
     isPlaying,
     volume,
     isMuted,
@@ -36,315 +60,183 @@ export function CustomMusicPlayer() {
     duration,
     isLoading,
     error,
-    audioRef,
-    setCurrentSong,
-    setIsPlaying,
-    setVolume,
-    setIsMuted,
-    setCurrentTime,
-    setDuration
+    // audioRef, // UI component usually doesn't need the audio ref directly
+    currentTrack,
+    // hasUserInteracted, // UI might not need this directly
+    togglePlay,
+    playNext,
+    playPrevious,
+    seek, // Use this for progress bar interactions
+    setVolume, // Use this for volume slider
+    toggleMute,
   } = useMusicPlayer();
 
+  // --- Local UI State & Refs ---
   const progressRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
-  const [isHovering, setIsHovering] = useState(false);
-  const [localCurrentTime, setLocalCurrentTime] = useState(0);
+  const [localCurrentTime, setLocalCurrentTime] = useState(0); // For smooth dragging display
   const [coverLoaded, setCoverLoaded] = useState(false);
-  const [componentError, setComponentError] = useState<Error | null>(null);
+  const [componentError, setComponentError] = useState<Error | null>(null); // For UI-specific errors
 
-  // 重置组件错误状态
-  const resetError = () => {
-    setComponentError(null);
-    // 重新加载当前歌曲
-    if (audioRef.current && playlist[currentSong]) {
-      const audio = audioRef.current;
-      audio.src = playlist[currentSong].src;
-      audio.load();
-      setIsPlaying(false);
-    }
-  };
-
-  // 错误处理包装函数
-  const withErrorHandling = (fn: (...args: any[]) => any) => {
-    return (...args: any[]) => {
-      try {
-        return fn(...args);
-      } catch (error) {
-        console.error('播放器组件错误:', error);
-        setComponentError(error as Error);
-        return undefined;
-      }
-    };
-  };
-
-  // 同步本地时间与上下文时间
-  useEffect(() => {
-    if (!isDraggingRef.current) {
-      setLocalCurrentTime(currentTime);
-    }
-  }, [currentTime]);
-
-  // 当歌曲变化时重置封面加载状态
-  useEffect(() => {
-    setCoverLoaded(false);
-  }, [currentSong]);
-
-  const handleProgressDragStart = withErrorHandling((e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault(); // 防止文本选择
-    isDraggingRef.current = true;
-    handleProgressDrag(e);
-  });
-
-  const handleProgressDrag = withErrorHandling((e: React.MouseEvent<HTMLDivElement> | MouseEvent) => {
-    if (isDraggingRef.current && progressRef.current) {
-      e.preventDefault(); // 防止文本选择
-      const rect = progressRef.current.getBoundingClientRect();
-      const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-      const newTime = percent * duration;
-      setLocalCurrentTime(newTime);
-    }
-  });
-
-  const handleProgressDragEnd = withErrorHandling(() => {
-    if (isDraggingRef.current && audioRef.current) {
-      audioRef.current.currentTime = localCurrentTime;
-      setCurrentTime(localCurrentTime);
-      isDraggingRef.current = false;
-    }
-  });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDraggingRef.current) {
-        e.preventDefault();
-        handleProgressDrag(e);
-      }
-    };
-
-    const handleMouseUp = () => {
-      if (isDraggingRef.current) {
-        handleProgressDragEnd();
-      }
-    };
-
-    if (isDraggingRef.current) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [duration, localCurrentTime]);
-
-  const handleProgressClick = withErrorHandling((e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault(); // 防止文本选择
-    if (progressRef.current && audioRef.current && !isDraggingRef.current) {
-      const rect = progressRef.current.getBoundingClientRect();
-      const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-      const newTime = percent * duration;
-      audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
-      setLocalCurrentTime(newTime);
-    }
-  });
-
-  const togglePlay = withErrorHandling(async () => {
-    if (audioRef.current) {
-      try {
-        if (isPlaying) {
-          await audioRef.current.pause();
-          // 保存当前时间位置，不做任何修改
-          setIsPlaying(false);
-        } else {
-          // 保持当前时间位置，不重置
-          const playPromise = audioRef.current.play();
-          if (playPromise !== undefined) {
-            await playPromise;
-            setIsPlaying(true);
-          }
-        }
-      } catch (error) {
-        console.error('Error toggling play state:', error);
-        setIsPlaying(false);
-      }
-    }
-  });
-
-  const toggleMute = withErrorHandling(() => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  });
-
-  const formatTime = (time: number) => {
+  // --- Helper Functions (mostly unchanged, operate on context data) ---
+  const formatTime = (time: number): string => {
     if (!isFinite(time) || time < 0) return '0:00';
     const minutes = Math.floor(time / 60);
     const remainingSeconds = Math.floor(time % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const playNext = withErrorHandling(() => {
-    if (playlist.length > 0) {
-      setCurrentSong((prev) => (prev + 1) % playlist.length);
-    }
-  });
-
-  const playPrevious = withErrorHandling(() => {
-    if (playlist.length > 0) {
-      setCurrentSong((prev) => (prev - 1 + playlist.length) % playlist.length);
-    }
-  });
-
-  // 错误格式化
-  const getErrorMessage = (error: MediaError | null) => {
-    if (!error) return '';
-    
+  const getErrorMessage = (err: MediaError | null): string => {
+    if (!err) return '';
     const errorMessages: Record<number, string> = {
-      1: '加载被中止',
-      2: '网络错误',
-      3: '解码错误',
-      4: '音频格式不支持'
+      1: '加载被中止', 2: '网络错误', 3: '解码错误', 4: '音频格式不支持'
     };
-    
-    return errorMessages[error.code] || '未知错误';
+    return errorMessages[err.code] || '未知错误';
   };
 
-  // 监听歌曲变化
+  // --- Effects for Local UI State ---
+
+  // Reset cover loaded state when track changes
   useEffect(() => {
-    if (audioRef.current && playlist[currentSong]?.src) {
-      const audio = audioRef.current;
-      const wasPlaying = isPlaying;
-      
-      audio.src = playlist[currentSong].src;
-      audio.load();
-      
-      const setupAudio = async () => {
-        try {
-          // 等待音频加载完成
-          await new Promise((resolve) => {
-            const handleCanPlay = () => {
-              audio.removeEventListener('canplay', handleCanPlay);
-              resolve(true);
-            };
-            
-            if (audio.readyState >= 3) {
-              resolve(true);
-            } else {
-              audio.addEventListener('canplay', handleCanPlay);
-            }
-          });
-          
-          // 新歌曲从头开始播放
-          audio.currentTime = 0;
-          setCurrentTime(0);
-          setLocalCurrentTime(0);
-          
-          // 如果之前在播放，则继续播放
-          if (wasPlaying) {
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-              await playPromise;
-            }
-          }
-        } catch (error) {
-          console.error('Error setting up audio:', error);
-          setIsPlaying(false);
-        }
-      };
-      
-      setupAudio();
+    setCoverLoaded(false);
+  }, [currentTrack?.src]); // Depend on src to detect track change
+
+  // Sync local time display with context time, unless dragging
+  useEffect(() => {
+    if (!isDraggingRef.current) {
+      setLocalCurrentTime(currentTime);
     }
-  }, [currentSong, playlist]);
+  }, [currentTime]);
 
-  // 添加错误处理
-  useEffect(() => {
-    if (audioRef.current) {
-      const audio = audioRef.current;
-      const handleError = (error: Event) => {
-        console.error('Audio error:', error, audio.error);
-        setIsPlaying(false);
-      };
-      audio.addEventListener('error', handleError);
-      return () => {
-        audio.removeEventListener('error', handleError);
-      };
-    }
-  }, []);
+  // --- Event Handlers (Call context functions) ---
 
-  // 更新音频时间
-  useEffect(() => {
-    if (!audioRef.current) return;
-
-    const audio = audioRef.current;
-    const updateTime = () => {
-      if (!isDraggingRef.current) {
-        setCurrentTime(audio.currentTime);
-        setLocalCurrentTime(audio.currentTime);
-        setDuration(audio.duration || 0);
+   // Error handling wrapper (simpler version for UI interactions)
+  const withErrorHandling = <T extends (...args: any[]) => any>(
+    fn: T
+  ): ((...args: Parameters<T>) => ReturnType<T> | void) => {
+    return (...args: Parameters<T>) => {
+      try {
+        // Call the function passed from the context (which should have its own error handling)
+        return fn(...args); 
+      } catch (err) {
+        console.error('UI component error during action:', err);
+        setComponentError(err as Error);
       }
     };
+  };
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-      setCurrentTime(audio.currentTime);
-      setLocalCurrentTime(audio.currentTime);
-    };
+  const handleTogglePlay = withErrorHandling(togglePlay);
+  const handlePlayNext = withErrorHandling(playNext);
+  const handlePlayPrevious = withErrorHandling(playPrevious);
+  const handleToggleMute = withErrorHandling(toggleMute);
+  
+  const handleVolumeChange = withErrorHandling((e: React.ChangeEvent<HTMLInputElement>) => {
+    setVolume(parseFloat(e.target.value));
+  });
 
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('durationchange', () => setDuration(audio.duration || 0));
+  // Progress bar interactions call the context 'seek' function
+  const handleProgressClick = withErrorHandling((e: React.MouseEvent<HTMLDivElement>) => {
+    if (progressRef.current && duration > 0) {
+      const rect = progressRef.current.getBoundingClientRect();
+      const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+      seek(percent * duration); // Call context's seek
+      setLocalCurrentTime(percent * duration); // Update local UI immediately
+    }
+  });
 
+  const handleProgressDragStart = withErrorHandling((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!duration) return;
+    e.preventDefault();
+    isDraggingRef.current = true;
+    if (progressRef.current) {
+        const rect = progressRef.current.getBoundingClientRect();
+        const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+        setLocalCurrentTime(percent * duration);
+    }
+  });
+
+  const handleProgressDrag = useCallback((e: MouseEvent) => {
+    if (isDraggingRef.current && progressRef.current && duration > 0) {
+      e.preventDefault();
+      const rect = progressRef.current.getBoundingClientRect();
+      const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+      setLocalCurrentTime(percent * duration); // Only update local time during drag
+    }
+  }, [duration]);
+
+  const handleProgressDragEnd = useCallback(() => {
+    if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        seek(localCurrentTime); // Seek to the final position using context function
+    }
+  }, [seek, localCurrentTime]);
+
+  // Add/remove global listeners for dragging outside the bar
+  useEffect(() => {
+    if (!isDraggingRef.current) return;
+    window.addEventListener('mousemove', handleProgressDrag);
+    window.addEventListener('mouseup', handleProgressDragEnd);
     return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('durationchange', () => setDuration(audio.duration || 0));
+      window.removeEventListener('mousemove', handleProgressDrag);
+      window.removeEventListener('mouseup', handleProgressDragEnd);
     };
-  }, []);
+  }, [isDraggingRef.current, handleProgressDrag, handleProgressDragEnd]);
 
-  // 计算进度条宽度 - 使用本地时间以响应拖动
+  // Reset local component error (may need a way to trigger context reset if needed)
+  const resetError = () => {
+    setComponentError(null);
+    // Note: Resetting context error state might require a dedicated context function
+  };
+
+  // --- Render Logic ---
   const progressWidth = duration > 0 ? (localCurrentTime / duration) * 100 : 0;
 
-  // 如果组件内部发生错误，显示错误处理界面
   if (componentError) {
+    // Provide a way to reset the local error state
     return <ErrorFallback error={componentError} resetErrorBoundary={resetError} />;
   }
 
-  if (playlist.length === 0) {
-    return (
+  // Display loading or no music message based on context state
+  if (playlist.length === 0 && isLoading) {
+     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center text-muted-foreground">
-          <Music2 className="h-8 w-8 mx-auto mb-2" />
-          <p>没有找到音乐文件</p>
-          <p className="text-sm">请将音乐文件放入 public/music 目录</p>
+          <div className="h-8 w-8 mx-auto mb-2 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p>正在加载播放列表...</p>
+        </div>
+      </div>
+    );
+  }
+  
+   if (playlist.length === 0 && !isLoading) {
+     return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center text-muted-foreground">
+           <Music2 className="h-8 w-8 mx-auto mb-2" />
+           <p>没有找到音乐文件</p>
+           <p className="text-sm">请检查 public/music 目录</p>
         </div>
       </div>
     );
   }
 
-  const currentTrack = playlist[currentSong];
-
+  // Main Player UI
   return (
+    // Removed the <audio> element - it now lives in the Context Provider
     <div className="h-full flex flex-col select-none">
       <div className="flex-1 flex flex-col justify-between min-h-0">
         <div className="space-y-4 flex-shrink-0">
-          {/* 专辑封面 */}
+          {/* Album Cover Section */} 
           <div className="relative pt-[100%] rounded-lg overflow-hidden bg-black/5 group">
-            {/* 错误显示 */}
+             {/* Context Error Overlay */} 
             {error && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/70 text-white p-4">
                 <AlertCircle className="h-10 w-10 text-red-500 mb-2" />
                 <p className="font-medium text-center">播放错误</p>
                 <p className="text-sm text-center mt-1">{getErrorMessage(error)}</p>
-                <button 
-                  onClick={() => {
-                    // 重置当前歌曲
-                    if (audioRef.current) {
-                      audioRef.current.load();
-                    }
-                  }}
+                {/* Reset button might need context interaction */}
+                 <button 
+                  onClick={resetError} // This only resets local error now
                   className="mt-4 flex items-center gap-1 px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-sm"
                 >
                   <RefreshCw className="h-3 w-3" /> 
@@ -352,39 +244,31 @@ export function CustomMusicPlayer() {
                 </button>
               </div>
             )}
-            
-            {/* 加载中显示 */}
+            {/* Loading Overlay (from context) */} 
             {isLoading && !error && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent" />
               </div>
             )}
-            
-            {currentTrack?.coverUrl ? (
+             {/* Cover Image / Placeholder */} 
+             {currentTrack?.coverUrl ? (
               <>
-                {/* 图片加载指示器 - 只在图片未加载时显示 */}
                 {!coverLoaded && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
                   </div>
                 )}
                 <Image
+                  key={currentTrack.src} 
                   src={currentTrack.coverUrl}
                   alt={`${currentTrack.title} 封面`}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className={`object-cover transition-all duration-300 group-hover:scale-105 ${coverLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  className={`object-cover transition-opacity duration-300 ${coverLoaded ? 'opacity-100' : 'opacity-0'}`}
                   priority
                   unoptimized
-                  onError={(e) => {
-                    console.error('Error loading cover image:', e);
-                    // 隐藏错误图片，显示默认封面
-                    e.currentTarget.style.display = 'none';
-                    setCoverLoaded(true);
-                  }}
-                  onLoad={() => {
-                    setCoverLoaded(true);
-                  }}
+                  onError={() => setCoverLoaded(true)} 
+                  onLoad={() => setCoverLoaded(true)}
                 />
               </>
             ) : (
@@ -392,133 +276,99 @@ export function CustomMusicPlayer() {
                 <Disc className="w-1/3 h-1/3 text-muted-foreground animate-[spin_3s_linear_infinite]" />
               </div>
             )}
-            {/* 播放按钮覆盖层 */}
-            <div
-              className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors cursor-pointer"
-              onClick={togglePlay}
-            >
-              <button
-                className="transform scale-0 group-hover:scale-100 transition-transform duration-200 p-4 rounded-full bg-white/90 text-black hover:bg-white"
-                aria-label={isPlaying ? "暂停" : "播放"}
-              >
-                {isPlaying ? (
-                  <Pause className="h-8 w-8" />
-                ) : (
-                  <Play className="h-8 w-8" />
-                )}
-              </button>
-            </div>
+             {/* Play Button Overlay */} 
+              {!isLoading && !error && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors cursor-pointer group-hover:opacity-100 opacity-0"
+                  onClick={handleTogglePlay} // Use wrapped handler
+                >
+                  <button
+                    className="transform scale-0 group-hover:scale-100 transition-transform duration-200 p-4 rounded-full bg-white/90 text-black hover:bg-white"
+                    aria-label={isPlaying ? "暂停" : "播放"}
+                  >
+                    {isPlaying ? (
+                      <Pause className="h-8 w-8" />
+                    ) : (
+                      <Play className="h-8 w-8" />
+                    )}
+                  </button>
+                </div>
+              )}
           </div>
-
-          {/* 当前播放信息 */}
-          <div className="text-center space-y-1">
-            <h3 className="font-medium text-lg line-clamp-1">{currentTrack?.title || '未知歌曲'}</h3>
-            <p className="text-sm text-muted-foreground line-clamp-1">
-              {currentTrack?.artist || '未知艺术家'}
-              {currentTrack?.album && ` · ${currentTrack.album}`}
-            </p>
-          </div>
+           {/* Song Info */} 
+          <SongInfoDisplay
+            title={currentTrack?.title}
+            artist={currentTrack?.artist}
+            album={currentTrack?.album}
+          />
         </div>
 
         <div className="space-y-4 mt-auto pb-2">
-          {/* 进度条和时间 */}
+           {/* Progress Bar */} 
           <div className="space-y-1.5 px-1">
             <div
               ref={progressRef}
-              className="group relative h-1 cursor-pointer rounded-full overflow-visible transition-all duration-200 touch-none"
+              className="group relative h-1 cursor-pointer rounded-full bg-gray-200 dark:bg-gray-700 touch-none"
               onClick={handleProgressClick}
               onMouseDown={handleProgressDragStart}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
             >
-              {/* 进度条背景 */}
-              <div className="absolute inset-0 rounded-full bg-gray-200 dark:bg-gray-700">
-                {/* 已播放部分 */}
-                <div
-                  className="absolute inset-0 rounded-full bg-[#1f66f4] transition-all duration-200"
-                  style={{ width: `${progressWidth}%` }}
-                />
-                {/* 悬停效果 - 未播放部分 */}
-                <div
-                  className="absolute inset-0 rounded-full bg-gray-300 dark:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  style={{ left: `${progressWidth}%` }}
-                />
-              </div>
-              {/* 拖动点 */}
               <div
-                className={`absolute w-3 h-3 top-1/2 -translate-y-1/2 -translate-x-1/2 transition-transform duration-200 will-change-transform ${
-                  isDraggingRef.current ? 'scale-110' : 'scale-100'
-                }`}
-                style={{
-                  left: `${progressWidth}%`,
-                }}
-              >
-                {/* 拖动点内圈 */}
-                <div className="absolute inset-0 rounded-full bg-white dark:bg-gray-900 shadow-lg" />
-                {/* 拖动点外圈 */}
-                <div className={`absolute inset-[-2px] rounded-full bg-[#1f66f4] opacity-30 ${
-                  isDraggingRef.current ? 'animate-ping' : ''
-                }`} />
-                {/* 拖动点装饰圈 */}
-                <div className="absolute inset-[-4px] rounded-full bg-[#1f66f4]/20" />
-              </div>
-              {/* 扩大可点击区域 */}
-              <div className="absolute inset-y-0 w-full -left-1 right-1">
-                <div className="absolute inset-y-[-8px] inset-x-[-8px] cursor-pointer" />
-              </div>
+                className="absolute inset-0 rounded-full bg-[#1f66f4]"
+                style={{ width: `${progressWidth}%` }}
+              />
+              <div 
+                className="absolute w-3 h-3 bg-white dark:bg-gray-900 rounded-full shadow-md top-1/2 -translate-y-1/2 -translate-x-1/2 border-2 border-[#1f66f4] transition-transform duration-150 group-hover:scale-110"
+                style={{ left: `${progressWidth}%` }}
+              />
+               <div className="absolute inset-y-[-8px] inset-x-[-4px]" /> 
             </div>
             <div className="flex justify-between text-xs text-muted-foreground px-1">
-              <span>{formatTime(localCurrentTime)}</span>
+              {/* Use localCurrentTime for smooth display while dragging */} 
+              <span>{formatTime(localCurrentTime)}</span> 
               <span>{formatTime(duration)}</span>
             </div>
           </div>
-
-          {/* 控制按钮 */}
+           {/* Controls */} 
           <div className="flex items-center justify-center space-x-6">
             <button
-              onClick={playPrevious}
-              className="p-2 hover:text-primary transition-colors"
+              onClick={handlePlayPrevious} // Use wrapped handler
+              className="p-2 hover:text-primary disabled:opacity-50 transition-colors"
               aria-label="上一首"
-              disabled={isLoading}
+              disabled={isLoading || playlist.length <= 1}
             >
-              <SkipBack className={`h-6 w-6 ${isLoading ? 'opacity-50' : ''}`} />
+              <SkipBack className="h-6 w-6" />
             </button>
             <button
-              onClick={togglePlay}
-              className={`p-4 rounded-full ${
-                isLoading 
-                  ? 'bg-gray-200 dark:bg-gray-700 text-muted-foreground cursor-wait' 
-                  : 'bg-primary/10 hover:bg-primary/20 text-primary'
-              } transition-colors`}
+              onClick={handleTogglePlay} // Use wrapped handler
+              className={`p-3 rounded-full ${isLoading ? 'bg-gray-200 dark:bg-gray-700 text-muted-foreground cursor-wait' : 'bg-primary/10 hover:bg-primary/20 text-primary'} transition-colors`}
               aria-label={isPlaying ? "暂停" : "播放"}
-              disabled={isLoading}
+              disabled={isLoading && !error} 
             >
-              {isLoading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              {isLoading && !error ? (
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : isPlaying ? (
-                <Pause className="h-7 w-7" />
+                <Pause className="h-6 w-6" />
               ) : (
-                <Play className="h-7 w-7" />
+                <Play className="h-6 w-6" />
               )}
             </button>
             <button
-              onClick={playNext}
-              className="p-2 hover:text-primary transition-colors"
+              onClick={handlePlayNext} // Use wrapped handler
+              className="p-2 hover:text-primary disabled:opacity-50 transition-colors"
               aria-label="下一首"
-              disabled={isLoading}
+              disabled={isLoading || playlist.length <= 1}
             >
-              <SkipForward className={`h-6 w-6 ${isLoading ? 'opacity-50' : ''}`} />
+              <SkipForward className="h-6 w-6" />
             </button>
           </div>
-
-          {/* 音量控制 */}
-          <div className="flex items-center space-x-2">
+           {/* Volume */} 
+          <div className="flex items-center space-x-2 px-2">
             <button
-              onClick={toggleMute}
+              onClick={handleToggleMute} // Use wrapped handler
               className="p-2 hover:text-[#1f66f4] transition-colors"
               aria-label={isMuted ? "取消静音" : "静音"}
             >
-              {isMuted ? (
+              {isMuted || volume === 0 ? (
                 <VolumeX className="h-5 w-5" />
               ) : (
                 <Volume2 className="h-5 w-5" />
@@ -529,9 +379,10 @@ export function CustomMusicPlayer() {
               min="0"
               max="1"
               step="0.01"
-              value={volume}
-              onChange={(e) => setVolume(parseFloat(e.target.value))}
-              className="flex-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full accent-[#1f66f4]"
+              value={isMuted ? 0 : volume}
+              onChange={handleVolumeChange} // Use wrapped handler
+              className="flex-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full accent-[#1f66f4] cursor-pointer"
+              aria-label="音量控制"
             />
           </div>
         </div>
