@@ -3,7 +3,7 @@
 import { Github, Mail } from 'lucide-react';
 import Link from 'next/link';
 import Footer from '@/app/components/Footer';
-import { siBilibili, siAfdian } from 'simple-icons/icons';
+import { siBilibili, siAfdian, siAlipay } from 'simple-icons/icons';
 
 export default function AboutPage() {
   return (
@@ -75,11 +75,11 @@ export default function AboutPage() {
                 <p className="text-muted-foreground mb-4">
                   如果你喜欢这个网站，欢迎通过以下方式支持我继续开发和维护。你的支持将帮助我持续改进网站，添加更多有趣的功能。
                 </p>
-                <div className="flex justify-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Link
                     href="https://afdian.net/@yukito0209"
                     target="_blank"
-                    className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50 w-full max-w-md"
+                    className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative flex items-center justify-center space-x-3">
@@ -95,6 +95,29 @@ export default function AboutPage() {
                       <div className="flex flex-col items-start">
                         <p className="font-medium group-hover:text-primary transition-colors duration-300">爱发电</p>
                         <p className="text-sm text-muted-foreground group-hover:text-primary/70 transition-colors duration-300">支持我的创作</p>
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="https://qr.alipay.com/fkx12345yourcode"
+                    target="_blank"
+                    className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative flex items-center justify-center space-x-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+                        <svg
+                          className="h-9 w-9 text-primary"
+                          role="img"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          dangerouslySetInnerHTML={{ __html: siAlipay.svg }}
+                        />
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <p className="font-medium group-hover:text-primary transition-colors duration-300">支付宝</p>
+                        <p className="text-sm text-muted-foreground group-hover:text-primary/70 transition-colors duration-300">扫码支持</p>
                       </div>
                     </div>
                   </Link>
