@@ -51,12 +51,27 @@ async function getMusicMetadata(filePath: string, fileName: string): Promise<Mus
     const versionMatch = fileNameWithoutNumber.match(/\((.*?)\)/);
     const version = versionMatch ? ` (${versionMatch[1]})` : '';
     
+    // 处理封面
+    let coverUrl: string | undefined;
+    const picture = metadata.common.picture?.[0];
+    if (picture) {
+      const coverFileName = `${fileNameWithoutExt}_cover.jpg`;
+      const coverPath = path.join(process.cwd(), 'public', 'music', coverFileName);
+      
+      // 如果封面文件不存在，则创建
+      if (!fs.existsSync(coverPath)) {
+        fs.writeFileSync(coverPath, picture.data);
+      }
+      
+      coverUrl = `/music/${coverFileName}`;
+    }
+    
     return {
       title: (common.title || fileNameWithoutNumber.replace(/\s*\(.*?\)$/, '')) + version,
       artist: common.artist || common.albumartist || '未知艺术家',
       album: common.album || '未知专辑',
       src: `/music/${fileName}`,
-      coverUrl: undefined // 将由调用方设置
+      coverUrl
     };
   } catch (error) {
     console.error('Error reading metadata:', error);
@@ -88,11 +103,9 @@ export async function GET() {
       const coverPath = path.join(musicDir, coverFileName);
       const hasCover = fs.existsSync(coverPath);
       
-      // 如果没有封面且是 FLAC 文件，尝试提取
-      if (hasCover) {
+      // 如果已经有封面，使用现有封面
+      if (hasCover && !musicInfo.coverUrl) {
         musicInfo.coverUrl = `/music/${coverFileName}`;
-      } else if (file.endsWith('.flac')) {
-        musicInfo.coverUrl = await extractCoverFromFlac(filePath, file);
       }
       
       return musicInfo;

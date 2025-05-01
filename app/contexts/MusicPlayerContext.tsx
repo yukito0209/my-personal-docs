@@ -43,9 +43,76 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<MediaError | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const wasPlayingRef = useRef(false);
+
+  // 初始化状态
+  useEffect(() => {
+    // 从 localStorage 恢复状态
+    const savedPlaylist = localStorage.getItem('musicPlayer_playlist');
+    const savedCurrentSong = localStorage.getItem('musicPlayer_currentSong');
+    const savedIsPlaying = localStorage.getItem('musicPlayer_isPlaying');
+    const savedVolume = localStorage.getItem('musicPlayer_volume');
+    const savedIsMuted = localStorage.getItem('musicPlayer_isMuted');
+    const savedCurrentTime = localStorage.getItem('musicPlayer_currentTime');
+
+    if (savedPlaylist) {
+      setPlaylist(JSON.parse(savedPlaylist));
+    }
+    if (savedCurrentSong) {
+      setCurrentSong(parseInt(savedCurrentSong));
+    }
+    if (savedIsPlaying) {
+      setIsPlaying(savedIsPlaying === 'true');
+      wasPlayingRef.current = savedIsPlaying === 'true';
+    }
+    if (savedVolume) {
+      setVolume(parseFloat(savedVolume));
+    }
+    if (savedIsMuted) {
+      setIsMuted(savedIsMuted === 'true');
+    }
+    if (savedCurrentTime) {
+      setCurrentTime(parseFloat(savedCurrentTime));
+    }
+
+    setIsInitialized(true);
+  }, []);
+
+  // 保存状态到 localStorage
+  useEffect(() => {
+    if (!isInitialized) return;
+    
+    localStorage.setItem('musicPlayer_playlist', JSON.stringify(playlist));
+    localStorage.setItem('musicPlayer_currentSong', currentSong.toString());
+    localStorage.setItem('musicPlayer_isPlaying', isPlaying.toString());
+    localStorage.setItem('musicPlayer_volume', volume.toString());
+    localStorage.setItem('musicPlayer_isMuted', isMuted.toString());
+    localStorage.setItem('musicPlayer_currentTime', currentTime.toString());
+  }, [playlist, currentSong, isPlaying, volume, isMuted, currentTime, isInitialized]);
+
+  // 监听页面可见性变化
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && wasPlayingRef.current) {
+        // 页面重新可见时，如果之前是播放状态，则继续播放
+        setIsPlaying(true);
+      } else if (document.visibilityState === 'hidden') {
+        // 页面隐藏时，记录播放状态
+        wasPlayingRef.current = isPlaying;
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isPlaying]);
 
   // 初始化音乐列表
   useEffect(() => {
+    if (!isInitialized) return;
+
     async function loadMusic() {
       try {
         const response = await fetch('/api/music');
@@ -54,10 +121,29 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
         }
         const data = await response.json();
         if (data.files) {
-          const processedFiles = data.files.map((file: Song) => ({
-            ...file,
-            src: file.src
+          const processedFiles = await Promise.all(data.files.map(async (file: Song) => {
+            // 验证封面 URL
+            let coverUrl = file.coverUrl;
+            if (coverUrl) {
+              try {
+                const response = await fetch(coverUrl, { method: 'HEAD' });
+                if (!response.ok) {
+                  console.warn(`Cover image not found: ${coverUrl}`);
+                  coverUrl = undefined;
+                }
+              } catch (error) {
+                console.warn(`Error validating cover URL: ${coverUrl}`, error);
+                coverUrl = undefined;
+              }
+            }
+            
+            return {
+              ...file,
+              src: file.src,
+              coverUrl
+            };
           }));
+          
           console.log('Processed music files:', processedFiles);
           setPlaylist(processedFiles);
         }
@@ -67,11 +153,11 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     }
 
     loadMusic();
-  }, []);
+  }, [isInitialized]);
 
   // 监听音频状态变化
   useEffect(() => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !isInitialized) return;
 
     const audio = audioRef.current;
 
@@ -104,8 +190,6 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('loadstart', handleLoadStart);
     audio.addEventListener('canplay', handleCanPlay);
-    audio.addEventListener('playing', () => setIsLoading(false));
-    audio.addEventListener('waiting', () => setIsLoading(true));
 
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
@@ -113,24 +197,47 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('playing', () => setIsLoading(false));
-      audio.removeEventListener('waiting', () => setIsLoading(true));
     };
-  }, [playlist.length]);
+  }, [playlist.length, isInitialized]);
+
+  // 监听播放状态变化
+  useEffect(() => {
+    if (!audioRef.current || !isInitialized) return;
+    
+    const audio = audioRef.current;
+    
+    if (isPlaying) {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          // 忽略用户未交互导致的自动播放错误
+          if (error.name === 'NotAllowedError') {
+            console.log('Autoplay prevented, waiting for user interaction');
+            setIsPlaying(false);
+            return;
+          }
+          console.error('Error playing audio:', error);
+          setIsPlaying(false);
+        });
+      }
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, isInitialized]);
 
   // 监听音量变化
   useEffect(() => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !isInitialized) return;
     audioRef.current.volume = isMuted ? 0 : volume;
-  }, [volume, isMuted]);
+  }, [volume, isMuted, isInitialized]);
 
-  // 监听歌曲变化
+  // 监听当前歌曲变化
   useEffect(() => {
-    if (!audioRef.current || !playlist[currentSong]) return;
-
+    if (!audioRef.current || !playlist[currentSong] || !isInitialized) return;
+    
     const audio = audioRef.current;
     const currentTrack = playlist[currentSong];
-
+    
     const loadAndPlay = async () => {
       try {
         setIsLoading(true);
@@ -138,76 +245,58 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
         audio.src = currentTrack.src;
         await audio.load();
         
+        // 恢复之前的播放位置
+        const savedCurrentTime = localStorage.getItem('musicPlayer_currentTime');
+        if (savedCurrentTime) {
+          audio.currentTime = parseFloat(savedCurrentTime);
+        }
+        
         if (isPlaying) {
           try {
-            await audio.play();
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+              await playPromise;
+            }
           } catch (error) {
-            console.error('Error playing audio:', error);
-            setIsPlaying(false);
+            // 忽略用户未交互导致的自动播放错误
+            if (error instanceof Error && error.name === 'NotAllowedError') {
+              console.log('Autoplay prevented, waiting for user interaction');
+              setIsPlaying(false);
+              return;
+            }
+            throw error;
           }
         }
       } catch (error) {
         console.error('Error loading audio:', error);
+        setError(audio.error);
         setIsPlaying(false);
       } finally {
         setIsLoading(false);
       }
     };
-
+    
     loadAndPlay();
-  }, [currentSong, playlist]);
+  }, [currentSong, playlist, isPlaying, isInitialized]);
 
-  // 监听播放状态变化
+  // 添加用户交互监听
   useEffect(() => {
-    if (!audioRef.current) return;
-    
-    const audio = audioRef.current;
-    
-    if (isPlaying) {
-      // 避免重复播放导致的错误
-      if (audio.paused) {
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.error('Error on auto-play:', error);
-            setIsPlaying(false);
-          });
-        }
+    const handleUserInteraction = () => {
+      // 用户交互后，如果之前是播放状态，则尝试恢复播放
+      if (wasPlayingRef.current) {
+        setIsPlaying(true);
       }
-    } else {
-      // 避免重复暂停导致的错误
-      if (!audio.paused) {
-        audio.pause();
-      }
-    }
-  }, [isPlaying]);
-
-  // 添加音频错误处理
-  useEffect(() => {
-    if (!audioRef.current) return;
-
-    const audio = audioRef.current;
-    const handleError = (event: Event) => {
-      const mediaError = audio.error;
-      setError(mediaError);
-      console.error('Audio error:', {
-        code: mediaError?.code,
-        message: mediaError?.message,
-        src: audio.src,
-        readyState: audio.readyState,
-        networkState: audio.networkState,
-        currentTime: audio.currentTime,
-        duration: audio.duration,
-        paused: audio.paused,
-        ended: audio.ended,
-        error: mediaError
-      });
-      setIsPlaying(false);
-      setIsLoading(false);
     };
 
-    audio.addEventListener('error', handleError);
-    return () => audio.removeEventListener('error', handleError);
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
   }, []);
 
   const value = {
@@ -227,7 +316,7 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     setVolume,
     setIsMuted,
     setCurrentTime,
-    setDuration,
+    setDuration
   };
 
   return (
@@ -236,28 +325,6 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
       <audio
         ref={audioRef}
         preload="auto"
-        onTimeUpdate={() => {
-          if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
-          }
-        }}
-        onLoadedMetadata={() => {
-          if (audioRef.current) {
-            setDuration(audioRef.current.duration);
-          }
-        }}
-        onEnded={() => {
-          if (playlist.length > 0) {
-            setCurrentSong((prev) => (prev + 1) % playlist.length);
-          }
-        }}
-        onError={() => {
-          if (audioRef.current) {
-            setError(audioRef.current.error);
-            setIsPlaying(false);
-            setIsLoading(false);
-          }
-        }}
       />
     </MusicPlayerContext.Provider>
   );

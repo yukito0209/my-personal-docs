@@ -31,6 +31,7 @@ export default function HomePage() {
                   width={100}
                   height={100}
                   className="rounded-full"
+                  priority
                 />
                 <h1 className="text-2xl font-bold">Yukito (Kerwin Wang)</h1>
                 <p className="text-center text-muted-foreground">

@@ -372,13 +372,15 @@ export function CustomMusicPlayer() {
                   src={currentTrack.coverUrl}
                   alt={`${currentTrack.title} 封面`}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className={`object-cover transition-all duration-300 group-hover:scale-105 ${coverLoaded ? 'opacity-100' : 'opacity-0'}`}
                   priority
                   unoptimized
                   onError={(e) => {
                     console.error('Error loading cover image:', e);
+                    // 隐藏错误图片，显示默认封面
                     e.currentTarget.style.display = 'none';
-                    setCoverLoaded(true); // 即使有错误也标记为已加载，以移除加载指示器
+                    setCoverLoaded(true);
                   }}
                   onLoad={() => {
                     setCoverLoaded(true);
