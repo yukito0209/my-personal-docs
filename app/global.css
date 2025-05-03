@@ -71,9 +71,18 @@
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
+    --border: 210 40% 92%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
+  }
+
+  /* 在暗色模式下，强制使用 --border 变量作为边框颜色 */
+  .dark .border,
+  .dark .border-t,
+  .dark .border-b,
+  .dark .border-l,
+  .dark .border-r {
+    border-color: hsl(var(--border));
   }
 
   /* 设置 body 字体 */

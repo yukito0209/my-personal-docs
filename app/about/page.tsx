@@ -61,15 +61,24 @@ export default function AboutPage() {
                       href="https://fumadocs.dev/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center px-4 py-2 border rounded-md hover:bg-accent transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:text-primary"
+                      className="inline-flex items-center justify-center px-4 py-2 border border-black dark:border-[hsl(var(--border))] rounded-md hover:bg-accent transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:text-primary"
                     >
-                      访问 Fumadocs 官网
+                      <svg width="16" height="16" viewBox="0 0 180 180" className="mr-2 h-4 w-4">
+                        <defs>
+                          <linearGradient id="fumadocsIconGradientAbout" gradientTransform="rotate(45)">
+                            <stop offset="45%" stopColor="currentColor" stopOpacity="0.2" /> 
+                            <stop offset="100%" stopColor="currentColor" />
+                          </linearGradient>
+                        </defs>
+                        <circle cx="90" cy="90" r="89" fill="url(#fumadocsIconGradientAbout)" stroke="currentColor" strokeWidth="2"></circle>
+                      </svg>
+                      Fumadocs 官网
                     </Link>
                     <Link
                       href="https://github.com/fuma-nama/fumadocs"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center px-4 py-2 border rounded-md hover:bg-accent transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:text-primary"
+                      className="inline-flex items-center justify-center px-4 py-2 border border-black dark:border-[hsl(var(--border))] rounded-md hover:bg-accent transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:text-primary"
                     >
                       <Github className="mr-2 h-4 w-4" />
                       Fumadocs GitHub
@@ -77,7 +86,7 @@ export default function AboutPage() {
                   </div>
                 </div>
                 
-                <hr className="border-border/50" />
+                <hr className="border-t border-black dark:border-[hsl(var(--border))]" />
 
                 <div>
                   <p className="text-muted-foreground mb-4">
@@ -89,7 +98,7 @@ export default function AboutPage() {
                       href="https://github.com/lxgw/LxgwWenKai"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center px-4 py-2 border rounded-md hover:bg-accent transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:text-primary"
+                      className="inline-flex items-center justify-center px-4 py-2 border border-black dark:border-[hsl(var(--border))] rounded-md hover:bg-accent transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:text-primary"
                     >
                       <Github className="mr-2 h-4 w-4" />
                       LXGW WenKai GitHub
