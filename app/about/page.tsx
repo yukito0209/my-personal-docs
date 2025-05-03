@@ -15,7 +15,7 @@ export default function AboutPage() {
             <p className="text-muted-foreground mb-6">
               欢迎来到我的个人空间！这是一个基于 Next.js 15 和 Fumadocs UI 构建，并经过深度定制的个人网站。
               它不仅是一个展示平台，也是我探索 Web 技术、实践设计理念的实验田。
-              这里融合了个人主页、技术文档、音乐播放、照片墙等多种功能，希望能为你带来独特的浏览体验。
+              这里融合了个人主页、技术文档、音乐播放、照片墙等多种功能，希望能为各位访客带来独特的浏览体验。
             </p>
 
             <section className="mb-8">
@@ -81,8 +81,8 @@ export default function AboutPage() {
 
                 <div>
                   <p className="text-muted-foreground mb-4">
-                    本站的全局中文字体采用了优秀的开源字体「霞鹜文楷 / LXGW WenKai」。其温润优雅的字形极大地提升了网站的阅读体验。
-                    感谢字体作者 <Link href="https://github.com/lxgw" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">lxgw</Link> 的无私奉献。
+                    本站的全局字体采用了优秀的开源字体「霞鹜文楷 / LXGW WenKai」。其温润优雅的字形极大地提升了网站的阅读体验。
+                    十分感谢字体作者 <Link href="https://github.com/lxgw" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">lxgw</Link> 的无私奉献。
                   </p>
                   <div className="flex flex-col items-center sm:flex-row sm:justify-center gap-4">
                     <Link
@@ -103,7 +103,7 @@ export default function AboutPage() {
               <h2 className="text-xl font-semibold mb-4">支持本站</h2>
               <div className="bg-card p-6 rounded-lg border glass-effect">
                 <p className="text-muted-foreground mb-4">
-                  如果你喜欢这个网站或它对你有所帮助，欢迎通过以下方式支持我。你的鼓励是我持续改进和分享的动力！
+                  如果您喜欢这个网站或它对你有所帮助，欢迎通过以下方式支持我。您的鼓励是我持续改进和分享的动力！
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Link
@@ -160,7 +160,7 @@ export default function AboutPage() {
             <section>
               <h2 className="text-xl font-semibold mb-4">联系方式</h2>
               <p className="text-muted-foreground mb-4">
-                有任何问题、建议或合作想法？欢迎通过以下方式联系我：
+                如果您有任何问题、建议或合作想法，欢迎通过以下方式联系我：
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link
