@@ -26,7 +26,7 @@ export default function AboutPage() {
                 <li>定制化本地音乐播放器，支持专辑封面显示</li>
                 <li>瀑布流布局的相册画廊</li>
                 <li>支持浅色/深色模式切换，并带有平滑过渡动画</li>
-                <li>全局应用 Klee One 和霞鹜文楷字体，提升阅读体验</li>
+                <li>全局应用霞鹜文楷 (LXGW WenKai) 字体，提升阅读体验</li>
                 <li>多处采用毛玻璃 (Frosted Glass) UI 效果，增强视觉层次感</li>
                 <li>实时公告栏（首页右侧），展示网站动态</li>
               </ul>
