@@ -4,6 +4,7 @@ import { PhotoCard } from './components/PhotoCard';
 import Link from 'next/link';
 import fs from 'fs';
 import path from 'path';
+import Footer from '@/app/components/Footer';
 
 function GalleryHeader() {
   return (
@@ -133,24 +134,30 @@ export default async function GalleryPage() {
     }));
 
     return (
-      <main className="flex flex-col items-center p-4 md:p-8">
-        <div className="w-full max-w-7xl">
-          <GalleryHeader />
-          <MasonryGrid>
-            {photos.map((photo, index) => (
-              <PhotoCard key={photo.src} photo={photo} />
-            ))}
-          </MasonryGrid>
+      <main className="flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col items-center p-4 md:p-8">
+          <div className="w-full max-w-7xl">
+            <GalleryHeader />
+            <MasonryGrid>
+              {photos.map((photo) => (
+                <PhotoCard key={photo.src} photo={photo} />
+              ))}
+            </MasonryGrid>
+          </div>
         </div>
+        <Footer />
       </main>
     );
   } catch (error) {
     console.error('Error loading gallery:', error);
     return (
-      <div className="flex flex-col items-center justify-center h-[50vh]">
-        <h2 className="text-xl font-semibold mb-2">加载相册失败</h2>
-        <p className="text-muted-foreground">请稍后重试</p>
-      </div>
+      <main className="flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <h2 className="text-xl font-semibold mb-2">加载相册失败</h2>
+          <p className="text-muted-foreground">请稍后重试</p>
+        </div>
+        <Footer />
+      </main>
     );
   }
 } 

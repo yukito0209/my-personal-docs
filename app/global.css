@@ -2,6 +2,21 @@
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 
+/* 导入 LXGW WenKai 字体 */
+@font-face {
+  font-family: 'LXGW WenKai';
+  src: url('/fonts/LXGWWenKai-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'LXGW WenKai';
+  src: url('/fonts/LXGWWenKai-Medium.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
 /* 隐藏 Fumadocs UI 的默认主题切换按钮 */
 [data-theme-toggle] {
   display: none !important;
@@ -11,6 +26,7 @@
     :root,
     :host {
         --color-fd-primary: #1f66f4 !important;
+        --font-sans: 'Klee One', 'LXGW WenKai', sans-serif !important;
     }
 }
 
@@ -59,14 +75,11 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
   }
-}
 
-@layer base {
-  * {
-    @apply border-gray-200 dark:border-gray-800;
-  }
+  /* 设置 body 字体 */
   body {
     @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+    font-family: var(--font-sans); /* 移除 !important */
     transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
     background-image: url('/backgrounds/bg_light.png');
     background-size: cover;
@@ -74,6 +87,25 @@
     background-attachment: fixed;
     background-repeat: no-repeat;
     position: relative;
+  }
+  
+  /* 设置标题字体 */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+  }
+  
+  /* 设置普通文本元素的字体 */
+  p, span, a, div,
+  button, input, textarea {
+    font-family: var(--font-sans);
+  }
+  
+  /* 确保导航栏字体 (保留 !important) */
+  .fd-nav,
+  .fd-nav *,
+  .fd-nav-title,
+  .fd-nav-title * {
+    font-family: var(--font-sans) !important;
   }
   
   body::before {
@@ -115,4 +147,16 @@
   img, svg {
     transition: none;
   }
+
+  /* 之前的特定 Fumadocs 规则可以暂时注释掉或移除，看上面的通用规则是否足够 */
+  
+  /* .fd-layout--home h1,
+  .fd-layout--home h2,
+  .fd-layout--home h3,
+  .fd-container h1,
+  .fd-container h2,
+  .fd-container h3 {
+     font-family: var(--font-sans) !important;
+  } */
+ 
 } 
