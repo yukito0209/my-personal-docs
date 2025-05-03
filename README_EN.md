@@ -6,8 +6,15 @@ A modern personal homepage and documentation system built with Next.js and Fumad
 
 ## 🌟 Features
 
-### 🏠 Homepage
+### 🎨 UI & Interaction
 - Responsive design for mobile and desktop
+- **Frosted glass UI effect applied in multiple areas**
+- **Global LXGW WenKai font applied**
+- **Custom light/dark mode toggle button**
+- **Smooth background image transition for light/dark modes**
+- **Photo card hover glow effect**
+
+### 🏠 Homepage
 - Personal information display
 - Education history
 - Interest showcase
@@ -15,24 +22,27 @@ A modern personal homepage and documentation system built with Next.js and Fumad
 - Real-time announcement board
 
 ### 🎵 Music Player
-- Local music file playback support
+- **Custom music player based on React Context**
+- Local music file playback support (MP3, WAV, OGG, FLAC)
 - Album cover display
 - Playback controls (play/pause, previous/next)
-- Volume control
-- Progress bar control
-- Support for MP3, WAV, OGG, FLAC formats
+- Volume control and progress bar
 
 ### 📚 Documentation System
 - Fumadocs-based document management
 - MDX format support
 - Document search functionality
-- Responsive navigation
+- **Content area and Table of Contents with glass effect**
+- **GitHub repository link in navigation bar**
 
 ### 🖼️ Gallery
 - Waterfall layout display
-- High-resolution image support
+- **Image lightbox viewer (with keyboard navigation)**
+- High-resolution image support and lazy loading
 - Responsive design
-- Image lazy loading
+
+### 🦶 Global Footer
+- Displays copyright and relevant links
 
 ## 🛠️ Tech Stack
 
@@ -40,8 +50,9 @@ A modern personal homepage and documentation system built with Next.js and Fumad
 - **UI Components**: Fumadocs UI 15.2.12
 - **Styling**: TailwindCSS 4.1.4
 - **Documentation**: Fumadocs MDX 11.6.1
-- **Icons**: Lucide React 0.503.0
+- **Icons**: Lucide React 0.503.0, **Simple Icons (Brand SVG icon library)**
 - **Type Checking**: TypeScript 5.8.3
+- **State Management**: **React Context API (for Theme and Music Player)**
 
 ## 📦 Project Structure
 

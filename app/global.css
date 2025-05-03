@@ -71,11 +71,11 @@
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 210 40% 92%;
+    --border: 210 40% 92%; 
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
   }
-
+  
   /* 在暗色模式下，强制使用 --border 变量作为边框颜色 */
   .dark .border,
   .dark .border-t,
@@ -85,11 +85,12 @@
     border-color: hsl(var(--border));
   }
 
-  /* 设置 body 字体 */
+  /* 设置 body 字体和背景过渡 */
   body {
     @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
     font-family: var(--font-sans);
-    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    /* 合并颜色和背景的过渡 */
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out; 
     background-image: url('/backgrounds/bg_light.png');
     background-size: cover;
     background-position: center;
@@ -101,22 +102,29 @@
   /* 设置标题字体 */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
+    /* 可以为标题添加颜色过渡，如果需要的话 */
+    /* transition: color 0.3s ease-in-out; */
   }
   
   /* 设置普通文本元素的字体 */
   p, span, a, div,
   button, input, textarea {
     font-family: var(--font-sans);
+    /* 移除这里的全局过渡，避免文本闪烁 */
   }
   
-  /* 确保导航栏字体 (保留 !important) */
-  .fd-nav,
-  .fd-nav *,
+  /* 确保导航栏字体，并禁用标题过渡 */
+  /* .fd-nav, 
+  .fd-nav * { 
+    transition: none !important; 
+  } */ /* 注释掉过于宽泛的规则 */
   .fd-nav-title,
-  .fd-nav-title * {
+  .fd-nav-title > span { /* 更精确地指向标题 span */
     font-family: var(--font-sans) !important;
+    transition-property: none !important; /* 覆盖 transition-property，阻止颜色过渡 */
   }
   
+  /* 深色模式背景图片过渡 */
   body::before {
     content: '';
     position: fixed;
@@ -130,7 +138,7 @@
     background-attachment: fixed;
     background-repeat: no-repeat;
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out; /* 只过渡 opacity */
     pointer-events: none;
     z-index: -1;
   }
@@ -139,35 +147,17 @@
     opacity: 1;
   }
   
-  /* 毛玻璃效果 */
+  /* 毛玻璃效果 - 添加背景色和阴影过渡 */
   .glass-effect {
     @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   }
   
-  /* 优化主题切换时的过渡效果 */
-  * {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
-  }
-  
-  /* 确保图片和图标在主题切换时不会闪烁 */
+  /* 确保图片和图标在主题切换时不会闪烁 (这个保留) */
   img, svg {
     transition: none;
   }
-
-  /* 之前的特定 Fumadocs 规则可以暂时注释掉或移除，看上面的通用规则是否足够 */
-  
-  /* .fd-layout--home h1,
-  .fd-layout--home h2,
-  .fd-layout--home h3,
-  .fd-container h1,
-  .fd-container h2,
-  .fd-container h3 {
-     font-family: var(--font-sans) !important;
-  } */
- 
 } 
 
 /* 相册卡片倾斜效果优化 */
@@ -178,15 +168,56 @@
              rotateY(var(--rotate-y, 0deg)) 
              scale3d(var(--scale, 1), var(--scale, 1), var(--scale, 1));
   
-  /* 定义过渡效果 */
-  transition: transform 0.15s ease-out; /* 调整时长和曲线以获得最佳效果 */
+  /* 定义过渡效果 - 添加 box-shadow 过渡 */
+  transition: transform 0.15s ease-out, box-shadow 0.2s ease-out;
   
   /* 保持 will-change 提示 */
-  will-change: transform;
+  will-change: transform, box-shadow;
 }
 
-/* 毛玻璃效果 */
-.glass-effect {
-  @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-} 
+/* 添加悬停时的发光效果 */
+.tilt-card:hover {
+  /* 使用白色创建光晕效果 */
+  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.7);
+}
+
+/* 尝试为 DocsLayout 中的 TOC 添加毛玻璃效果 */
+.fd-layout > aside[aria-label="Table of Contents"] {
+  @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 rounded-lg p-4;
+  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* 添加过渡 */
+  /* 可能需要根据实际效果调整 padding 或其他样式 */
+}
+
+/* 如果 TOC 在一个 div 里 */
+.fd-layout > div[role="complementary"] {
+   @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 rounded-lg p-4;
+   transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* 添加过渡 */
+   /* 可能需要根据实际效果调整 padding 或其他样式 */
+}
+
+/* 增加特异性，如果上述规则无效 */
+.fd-docs > main > aside[aria-label="Table of Contents"],
+.fd-docs > main > div[role="complementary"] {
+   @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 rounded-lg p-4;
+   transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* 添加过渡 */
+   /* 可能需要根据实际效果调整 padding 或其他样式 */
+}
+
+/* 直接应用给 Clerk 样式的 TOC (因为 page.tsx 中指定了 style: 'clerk') */
+.fd-toc--clerk {
+    @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 rounded-lg p-4;
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* 添加过渡 */
+}
+
+/* --- 修复特定元素主题切换闪烁 --- */
+/* 为个人作品卡片标题禁用颜色过渡，保留其他效果 */
+.work-card-title {
+    transition-property: background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+/* 禁用公告栏卡片内 *所有后代元素* 的过渡 */
+.announcement-card * {
+    transition: none !important;
+}

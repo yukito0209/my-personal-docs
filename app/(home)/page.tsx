@@ -111,7 +111,7 @@ export default function HomePage() {
                       <Book className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-lg mb-2 group-hover:text-primary transition-colors">技术文档</h3>
+                      <h3 className="font-medium text-lg mb-2 group-hover:text-primary transition-colors work-card-title">技术文档</h3>
                       <p className="text-sm text-muted-foreground mb-3">
                         记录我的学习笔记、技术心得和项目经验，包含前端开发、系统设计等多个主题。
                       </p>
@@ -132,7 +132,7 @@ export default function HomePage() {
                       <Camera className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-lg mb-2 group-hover:text-primary transition-colors">摄影作品</h3>
+                      <h3 className="font-medium text-lg mb-2 group-hover:text-primary transition-colors work-card-title">摄影作品</h3>
                       <p className="text-sm text-muted-foreground mb-3">
                         分享我的摄影作品集，记录生活中的美好瞬间，展现独特的视角和创作理念。
                       </p>
@@ -156,27 +156,27 @@ export default function HomePage() {
                   <h3 className="font-medium">最新公告</h3>
                 </div>
                 <div className="space-y-3 flex-1 overflow-y-auto">
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
                     <p className="text-sm font-medium mb-1">🎉 UI & 字体更新</p>
                     <p className="text-xs text-muted-foreground">全站字体更换为霞鹜文楷，提升阅读体验。多处界面应用毛玻璃效果。</p>
                     <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
                   </div>
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
                     <p className="text-sm font-medium mb-1">✨ 功能增强</p>
                     <p className="text-xs text-muted-foreground">导航栏新增 GitHub 仓库链接。更新了关于页面内容。</p>
                     <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
                   </div>
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
                     <p className="text-sm font-medium mb-1">🖼️ 相册与页脚</p>
                     <p className="text-xs text-muted-foreground">相册页面添加页脚。美化了全站页脚样式。</p>
                     <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
                   </div>
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
                     <p className="text-sm font-medium mb-1">🎨 细节优化</p>
                     <p className="text-xs text-muted-foreground">优化了深色/浅色模式切换的背景过渡效果。</p>
                     <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
                   </div>
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
                     <p className="text-sm font-medium mb-1">🎵 音乐播放器</p>
                     <p className="text-xs text-muted-foreground">音乐播放器功能上线，支持本地音乐播放与专辑封面。</p>
                     <p className="text-xs text-muted-foreground mt-1">2025-05-01</p>
