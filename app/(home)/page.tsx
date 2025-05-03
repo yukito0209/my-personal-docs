@@ -156,30 +156,30 @@ export default function HomePage() {
                   <h3 className="font-medium">最新公告</h3>
                 </div>
                 <div className="space-y-3 flex-1 overflow-y-auto">
-                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
-                    <p className="text-sm font-medium mb-1">🎉 网站更新</p>
-                    <p className="text-xs text-muted-foreground">新增音乐播放器功能，支持显示专辑封面和歌词。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2024-03-19</p>
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">🎉 UI & 字体更新</p>
+                    <p className="text-xs text-muted-foreground">全站字体更换为霞鹜文楷，提升阅读体验。多处界面应用毛玻璃效果。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
                   </div>
-                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
-                    <p className="text-sm font-medium mb-1">📚 文档系统</p>
-                    <p className="text-xs text-muted-foreground">完善了文档系统的搜索功能和导航结构。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2024-03-18</p>
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">✨ 功能增强</p>
+                    <p className="text-xs text-muted-foreground">导航栏新增 GitHub 仓库链接。更新了关于页面内容。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
                   </div>
-                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
-                    <p className="text-sm font-medium mb-1">🌟 即将上线</p>
-                    <p className="text-xs text-muted-foreground">相册功能开发中，敬请期待。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2024-03-17</p>
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">🖼️ 相册与页脚</p>
+                    <p className="text-xs text-muted-foreground">相册页面添加页脚。美化了全站页脚样式。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
                   </div>
-                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
-                    <p className="text-sm font-medium mb-1">🔧 性能优化</p>
-                    <p className="text-xs text-muted-foreground">优化了网站加载速度和响应性能。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2024-03-16</p>
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">🎨 细节优化</p>
+                    <p className="text-xs text-muted-foreground">优化了深色/浅色模式切换的背景过渡效果。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
                   </div>
-                  <div className="p-3 rounded-md bg-black/5 hover:bg-black/10 transition-colors">
-                    <p className="text-sm font-medium mb-1">🎨 界面更新</p>
-                    <p className="text-xs text-muted-foreground">优化了深色模式下的显示效果。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2024-03-15</p>
+                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                    <p className="text-sm font-medium mb-1">🎵 音乐播放器</p>
+                    <p className="text-xs text-muted-foreground">音乐播放器功能上线，支持本地音乐播放与专辑封面。</p>
+                    <p className="text-xs text-muted-foreground mt-1">2025-05-01</p>
                   </div>
                 </div>
               </div>

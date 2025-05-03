@@ -160,3 +160,24 @@
   } */
  
 } 
+
+/* 相册卡片倾斜效果优化 */
+.tilt-card {
+  /* 定义 transform 如何变化 */
+  transform: perspective(1000px) 
+             rotateX(var(--rotate-x, 0deg)) 
+             rotateY(var(--rotate-y, 0deg)) 
+             scale3d(var(--scale, 1), var(--scale, 1), var(--scale, 1));
+  
+  /* 定义过渡效果 */
+  transition: transform 0.15s ease-out; /* 调整时长和曲线以获得最佳效果 */
+  
+  /* 保持 will-change 提示 */
+  will-change: transform;
+}
+
+/* 毛玻璃效果 */
+.glass-effect {
+  @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+} 

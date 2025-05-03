@@ -8,6 +8,10 @@ import { ThemeToggle } from './components/ThemeToggle';
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" /* className={inter.className} */ suppressHydrationWarning>
+      <head>
+        <link rel="preload" href="/fonts/LXGWWenKai-Regular.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/LXGWWenKai-Medium.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
+      </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider theme={{ defaultTheme: 'system', enableSystem: true }}>
           <ThemeProvider>

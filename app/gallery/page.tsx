@@ -1,10 +1,11 @@
+'use client';
+
 import Image from 'next/image';
-import { Camera, Aperture, ArrowRight } from 'lucide-react';
+import { Camera, Aperture, ArrowRight, ArrowLeft, X } from 'lucide-react';
 import { PhotoCard } from './components/PhotoCard';
 import Link from 'next/link';
-import fs from 'fs';
-import path from 'path';
 import Footer from '@/app/components/Footer';
+import { useState, useCallback, useEffect } from 'react';
 
 function GalleryHeader() {
   return (
@@ -122,42 +123,210 @@ function MasonryGrid({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default async function GalleryPage() {
-  try {
-    const photosDir = path.join(process.cwd(), 'public', 'photos');
-    const files = fs.readdirSync(photosDir)
-      .filter(file => !file.startsWith('.') && (file.toLowerCase().endsWith('.jpg') || file.toLowerCase().endsWith('.png')));
-    
-    const photos = files.map(file => ({
-      src: `/photos/${file}`,
-      alt: file.split('.')[0]
-    }));
+interface Photo {
+  src: string;
+  alt: string;
+}
 
-    return (
-      <main className="flex flex-col min-h-screen">
-        <div className="flex-1 flex flex-col items-center p-4 md:p-8">
-          <div className="w-full max-w-7xl">
-            <GalleryHeader />
-            <MasonryGrid>
-              {photos.map((photo) => (
-                <PhotoCard key={photo.src} photo={photo} />
-              ))}
-            </MasonryGrid>
-          </div>
-        </div>
-        <Footer />
-      </main>
+export default function GalleryPage() {
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [isLoadingError, setIsLoadingError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function fetchPhotos() {
+      setIsLoading(true);
+      setIsLoadingError(null);
+      try {
+        const response = await fetch('/api/gallery');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.photos && Array.isArray(data.photos)) {
+          setPhotos(data.photos);
+        } else {
+          setPhotos([]);
+        }
+      } catch (error) {
+        console.error('Error loading gallery:', error);
+        setIsLoadingError(error as Error);
+        setPhotos([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchPhotos();
+  }, []);
+
+  const openModal = useCallback((index: number) => {
+    setSelectedImageIndex(index);
+    setIsModalOpen(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedImageIndex(null);
+  }, []);
+
+  const showNext = useCallback(() => {
+    if (selectedImageIndex === null || photos.length === 0) return;
+    setSelectedImageIndex((prevIndex) => 
+      prevIndex === null ? 0 : (prevIndex + 1) % photos.length
     );
-  } catch (error) {
-    console.error('Error loading gallery:', error);
+  }, [selectedImageIndex, photos.length]);
+
+  const showPrevious = useCallback(() => {
+    if (selectedImageIndex === null || photos.length === 0) return;
+    setSelectedImageIndex((prevIndex) =>
+      prevIndex === null ? 0 : (prevIndex - 1 + photos.length) % photos.length
+    );
+  }, [selectedImageIndex, photos.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isModalOpen) return;
+      if (event.key === 'ArrowRight') {
+        showNext();
+      }
+      if (event.key === 'ArrowLeft') {
+        showPrevious();
+      }
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen, showNext, showPrevious, closeModal]);
+
+  if (isLoadingError) {
     return (
       <main className="flex flex-col min-h-screen">
         <div className="flex-1 flex flex-col items-center justify-center">
           <h2 className="text-xl font-semibold mb-2">加载相册失败</h2>
           <p className="text-muted-foreground">请稍后重试</p>
+          <p className="text-xs text-red-500 mt-2">{isLoadingError.message}</p>
         </div>
         <Footer />
       </main>
     );
   }
+
+  const selectedPhoto = selectedImageIndex !== null ? photos[selectedImageIndex] : null;
+
+  return (
+    <main className="flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col items-center p-4 md:p-8">
+        <div className="w-full max-w-7xl">
+          <GalleryHeader />
+          {isLoading && (
+            <div className="flex justify-center items-center h-40">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            </div>
+          )}
+          {!isLoading && !isLoadingError && photos.length > 0 && (
+            <MasonryGrid>
+              {photos.map((photo, index) => (
+                <PhotoCard 
+                  key={photo.src} 
+                  photo={photo} 
+                  index={index}
+                  openModal={openModal}
+                />
+              ))}
+            </MasonryGrid>
+          )}
+          {!isLoading && !isLoadingError && photos.length === 0 && (
+             <div className="text-center text-muted-foreground py-10">
+               <Camera className="h-8 w-8 mx-auto mb-2" />
+               <p>未能找到任何照片。</p>
+               <p className="text-sm">请检查 /public/photos 目录或 API 路由。</p>
+             </div>
+          )}
+        </div>
+      </div>
+      <Footer />
+
+      {isModalOpen && selectedPhoto && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in"
+          onClick={closeModal}
+        >
+          <div 
+            className="relative w-full h-full p-4 sm:p-8 flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              key={selectedPhoto.src}
+              src={selectedPhoto.src}
+              alt={selectedPhoto.alt}
+              fill
+              sizes="100vw"
+              className="object-contain animate-zoom-in"
+              priority
+            />
+          </div>
+ 
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              closeModal();
+            }}
+            className="absolute right-4 top-4 sm:right-6 sm:top-6 rounded-full bg-white/10 p-2 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white/20"
+            aria-label="关闭"
+          >
+            <X className="h-6 w-6 text-white" />
+          </button>
+ 
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              showPrevious();
+            }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 sm:left-4 rounded-full bg-white/10 p-2 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="上一张"
+            disabled={photos.length <= 1}
+          >
+            <ArrowLeft className="h-6 w-6 text-white" />
+          </button>
+ 
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              showNext();
+            }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 sm:right-4 rounded-full bg-white/10 p-2 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="下一张"
+            disabled={photos.length <= 1}
+          >
+            <ArrowRight className="h-6 w-6 text-white" />
+          </button>
+        </div>
+      )}
+      <style jsx global>{`
+        @keyframes fade-in {
+          from { opacity: 0; backdrop-filter: blur(0px); }
+          to { opacity: 1; backdrop-filter: blur(4px); }
+        }
+        @keyframes zoom-in {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out forwards;
+        }
+        .animate-zoom-in {
+          animation: zoom-in 0.3s ease-out forwards;
+        }
+      `}</style>
+    </main>
+  );
 } 
