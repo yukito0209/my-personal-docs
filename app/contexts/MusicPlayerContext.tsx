@@ -30,6 +30,7 @@ interface MusicPlayerContextType {
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
+  playSongAtIndex: (index: number) => void;
   // Internal setters might not need exposure
   // setPlaylist: (songs: Song[]) => void;
   // setCurrentSongIndex: (indexOrUpdater: number | ((prev: number) => number)) => void;
@@ -166,21 +167,28 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
 
     // --- Audio Event Handlers ---
      const handleLoadedMetadata = () => {
+        const audio = audioRef.current;
+        if (!audio || !currentTrack) return;
         console.log(`[Context Event loadedmetadata] ${currentTrack.title}`);
-        setDuration(audio.duration || 0);
-        if (!isTimeApplied && isFinite(currentTime) && currentTime >= 0) {
-            if (audio.readyState >= 1) {
-                console.log(`[Context Event loadedmetadata] Applying time: ${currentTime}`);
-                if (Math.abs(audio.currentTime - currentTime) > 0.1) {
-                    audio.currentTime = currentTime;
+        const newDuration = audio.duration || 0;
+        setDuration(newDuration);
+        
+        // **Remove the explicit setting of audio.currentTime here**
+        // Let the audio element start naturally at 0, and let timeupdate handle state
+        /* 
+        const targetTime = 0; // Or read currentTime state if needed for resuming?
+        if (isFinite(targetTime) ...) {
+            if (audio.readyState >= 1) { 
+                console.log(`[Context Event loadedmetadata] Applying time: ${targetTime}`);
+                if (Math.abs(audio.currentTime - targetTime) > 0.1) {
+                    audio.currentTime = targetTime;
                 }
-                setIsTimeApplied(true);
-            } else {
-                 setIsTimeApplied(true); // Mark attempted even if failed
-            }
-        } else {
-            if (!isTimeApplied) setIsTimeApplied(true); // Ensure flag is set
+            } 
         }
+        */
+        
+        // Mark that metadata is loaded, allowing playback attempt
+        setIsTimeApplied(true); 
     };
 
     const handleCanPlay = () => {
@@ -202,11 +210,11 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     };
 
     const handleTimeUpdate = () => {
-        if (!isSeekingRef.current) { 
-            const time = audio.currentTime;
-            setCurrentTime(time);
-            localStorage.setItem('musicPlayer_currentTime', time.toString());
-        }
+        const audio = audioRef.current;
+        if (!audio || isSeekingRef.current) return;
+        const time = audio.currentTime;
+        setCurrentTime(time);
+        localStorage.setItem('musicPlayer_currentTime', time.toString());
     };
 
     const handleEnded = () => {
@@ -249,7 +257,7 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSongIndex, playlist]); // Rerun only when song or playlist changes
+  }, [currentSongIndex, playlist, currentTrack]); // Ensure currentTrack is correctly listed if needed or derived
 
   // 4. Control Play/Pause based on isPlaying State
   useEffect(() => {
@@ -257,30 +265,34 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     if (!audio) return;
 
     if (isPlaying) {
-        // Only try to play if conditions are met
-        if (isTimeApplied && audio.readyState >= 3 && audio.paused && hasUserInteracted) {
-            console.log(`[Context Play/Pause Effect] isPlaying=true, attempting play()`);
-            audio.play().catch(e => {
-                console.error('[Context Play/Pause Effect] Play error:', e);
-                 if (e instanceof Error && e.name === 'NotAllowedError') {
-                    setIsPlaying(false); // Correct state
-                 } else {
-                     setError(audio.error);
-                     setIsPlaying(false);
-                 }
-            });
-        } else if (!hasUserInteracted && audio.paused) {
-             // If play is toggled true but no interaction, revert state
-             if (isPlaying) setIsPlaying(false);
-        }
+      // Try to play if user has interacted and audio has at least metadata loaded
+      // We check audio.paused because the play() call might be asynchronous
+      if (audio.paused && hasUserInteracted && audio.readyState >= 1) { // readyState 1 = HAVE_METADATA
+        console.log(`[Context Play/Pause Effect] isPlaying=true, readyState=${audio.readyState}. Attempting play().`);
+        audio.play().catch(e => {
+          console.error('[Context Play/Pause Effect] Play error:', e);
+          if (e instanceof Error && e.name === 'NotAllowedError') {
+            setIsPlaying(false); // Correct state if autoplay blocked
+          } else {
+            setError(audio.error); // Set other errors
+            setIsPlaying(false);
+          }
+        });
+      } else if (!hasUserInteracted) {
+         console.log('[Context Play/Pause Effect] isPlaying=true, but waiting for interaction.');
+         if (isPlaying) setIsPlaying(false); // Correct state if play was attempted without interaction
+      } else if (audio.readyState < 1) {
+         console.log(`[Context Play/Pause Effect] isPlaying=true, but waiting for audio readyState (current: ${audio.readyState})`);
+      }
     } else {
-        // If state is false, pause
-        if (!audio.paused) {
-            console.log('[Context Play/Pause Effect] isPlaying=false, pausing');
-            audio.pause();
-        }
+      // If isPlaying is false, pause the audio
+      if (!audio.paused) {
+        console.log('[Context Play/Pause Effect] isPlaying=false, pausing.');
+        audio.pause();
+      }
     }
-  }, [isPlaying, isTimeApplied, hasUserInteracted]); // React to state changes
+  // Depend only on isPlaying and hasUserInteracted for triggering play/pause actions
+  }, [isPlaying, hasUserInteracted]);
 
   // 5. Handle Volume/Mute
   useEffect(() => {
@@ -392,6 +404,27 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
       setIsMuted(prev => !prev);
   }, []);
 
+  // Modified playSongAtIndex - Keep setCurrentTime(0)
+  const playSongAtIndex = useCallback((index: number) => {
+    if (index >= 0 && index < playlist.length) {
+      if (index === currentSongIndex) {
+        togglePlay();
+      } else {
+        console.log(`[Context playSongAtIndex] Changing to index: ${index}`);
+        setCurrentTime(0); // Reset state time to 0
+        setCurrentSongIndex(index);
+        setIsTimeApplied(false); 
+        if (hasUserInteracted) {
+            setIsPlaying(true); 
+        } else {
+            wasPlayingRef.current = true;
+        }
+      }
+    } else {
+      console.warn(`[Context playSongAtIndex] Invalid index: ${index}`);
+    }
+  // Added setCurrentTime to dependencies
+  }, [playlist.length, currentSongIndex, togglePlay, hasUserInteracted, setCurrentTime]);
 
   // --- Context Value ---
   const value: MusicPlayerContextType = {
@@ -413,6 +446,7 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     seek,
     setVolume: handleSetVolume,
     toggleMute,
+    playSongAtIndex,
   };
 
   return (

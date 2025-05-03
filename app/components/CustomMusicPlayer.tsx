@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music2, Disc, AlertCircle, RefreshCw } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music2, Disc, AlertCircle, RefreshCw, ListMusic, X } from 'lucide-react';
 import Image from 'next/image';
-import { useMusicPlayer } from '../contexts/MusicPlayerContext'; // Use the context hook
+import { useMusicPlayer } from '../contexts/MusicPlayerContext';
 
 interface Song {
   title: string;
@@ -52,7 +52,7 @@ export function CustomMusicPlayer() {
   // --- Get state and controls from Context ---
   const {
     playlist,
-    // currentSongIndex, // No longer needed directly if currentTrack is provided
+    currentSongIndex,
     isPlaying,
     volume,
     isMuted,
@@ -60,15 +60,14 @@ export function CustomMusicPlayer() {
     duration,
     isLoading,
     error,
-    // audioRef, // UI component usually doesn't need the audio ref directly
     currentTrack,
-    // hasUserInteracted, // UI might not need this directly
     togglePlay,
     playNext,
     playPrevious,
-    seek, // Use this for progress bar interactions
-    setVolume, // Use this for volume slider
+    seek,
+    setVolume,
     toggleMute,
+    playSongAtIndex,
   } = useMusicPlayer();
 
   // --- Local UI State & Refs ---
@@ -77,6 +76,7 @@ export function CustomMusicPlayer() {
   const [localCurrentTime, setLocalCurrentTime] = useState(0); // For smooth dragging display
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [componentError, setComponentError] = useState<Error | null>(null); // For UI-specific errors
+  const [isPlaylistViewOpen, setIsPlaylistViewOpen] = useState(false); // State for view toggle
 
   // --- Helper Functions (mostly unchanged, operate on context data) ---
   const formatTime = (time: number): string => {
@@ -222,67 +222,65 @@ export function CustomMusicPlayer() {
 
   // Main Player UI
   return (
-    // Removed the <audio> element - it now lives in the Context Provider
     <div className="h-full flex flex-col select-none">
-      <div className="flex-1 flex flex-col justify-between min-h-0">
-        <div className="space-y-4 flex-shrink-0">
-          {/* Album Cover Section */} 
-          <div className="relative pt-[100%] rounded-lg overflow-hidden bg-black/5 group">
-             {/* Context Error Overlay */} 
-            {error && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/70 text-white p-4">
-                <AlertCircle className="h-10 w-10 text-red-500 mb-2" />
-                <p className="font-medium text-center">播放错误</p>
-                <p className="text-sm text-center mt-1">{getErrorMessage(error)}</p>
-                {/* Reset button might need context interaction */}
-                 <button 
-                  onClick={resetError} // This only resets local error now
-                  className="mt-4 flex items-center gap-1 px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-sm"
-                >
-                  <RefreshCw className="h-3 w-3" /> 
-                  重试
-                </button>
-              </div>
-            )}
-            {/* Loading Overlay (from context) */} 
-            {isLoading && !error && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent" />
-              </div>
-            )}
-             {/* Cover Image / Placeholder */} 
-             {currentTrack?.coverUrl ? (
-              <>
-                {!coverLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                  </div>
-                )}
-                <Image
-                  key={currentTrack.src} 
-                  src={currentTrack.coverUrl}
-                  alt={`${currentTrack.title} 封面`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className={`object-cover ${coverLoaded ? 'opacity-100' : 'opacity-0'} 
-                             transition-all duration-300 ease-in-out 
-                             group-hover:scale-105 group-hover:brightness-110`}
-                  priority
-                  unoptimized
-                  onError={() => setCoverLoaded(true)} 
-                  onLoad={() => setCoverLoaded(true)}
-                />
-              </>
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/5">
-                <Disc className="w-1/3 h-1/3 text-muted-foreground animate-[spin_3s_linear_infinite]" />
-              </div>
-            )}
-             {/* Play Button Overlay */} 
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+        <div 
+          className={`absolute inset-0 transition-all duration-300 ease-in-out flex flex-col justify-between ${ 
+            isPlaylistViewOpen ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
+          }`}
+        >
+          <div className="space-y-4 flex-shrink-0 p-4 pt-0">
+            <div className="relative pt-[100%] rounded-lg overflow-hidden bg-black/5 group">
+              {error && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/70 text-white p-4">
+                  <AlertCircle className="h-10 w-10 text-red-500 mb-2" />
+                  <p className="font-medium text-center">播放错误</p>
+                  <p className="text-sm text-center mt-1">{getErrorMessage(error)}</p>
+                  <button 
+                    onClick={resetError}
+                    className="mt-4 flex items-center gap-1 px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-sm"
+                  >
+                    <RefreshCw className="h-3 w-3" /> 
+                    重试
+                  </button>
+                </div>
+              )}
+              {isLoading && !error && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
+                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent" />
+                </div>
+              )}
+              {currentTrack?.coverUrl ? (
+                <>
+                  {!coverLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                    </div>
+                  )}
+                  <Image
+                    key={currentTrack.src} 
+                    src={currentTrack.coverUrl}
+                    alt={`${currentTrack.title} 封面`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className={`object-cover ${coverLoaded ? 'opacity-100' : 'opacity-0'} 
+                               transition-all duration-300 ease-in-out 
+                               group-hover:scale-105 group-hover:brightness-110`}
+                    priority
+                    unoptimized
+                    onError={() => setCoverLoaded(true)} 
+                    onLoad={() => setCoverLoaded(true)}
+                  />
+                </>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/5">
+                  <Disc className="w-1/3 h-1/3 text-muted-foreground animate-[spin_3s_linear_infinite]" />
+                </div>
+              )}
               {!isLoading && !error && (
                 <div
                   className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors cursor-pointer group-hover:opacity-100 opacity-0"
-                  onClick={handleTogglePlay} // Use wrapped handler
+                  onClick={handleTogglePlay}
                 >
                   <button
                     className="transform scale-0 group-hover:scale-100 transition-transform duration-200 p-4 rounded-full bg-white/90 text-black hover:bg-white"
@@ -296,97 +294,88 @@ export function CustomMusicPlayer() {
                   </button>
                 </div>
               )}
-          </div>
-           {/* Song Info */} 
-          <SongInfoDisplay
-            title={currentTrack?.title}
-            artist={currentTrack?.artist}
-            album={currentTrack?.album}
-          />
-        </div>
-
-        <div className="space-y-4 mt-auto pb-2">
-           {/* Progress Bar */} 
-          <div className="space-y-1.5 px-1">
-            <div
-              ref={progressRef}
-              className="group relative h-1 cursor-pointer rounded-full bg-gray-200 dark:bg-gray-700 touch-none"
-              onClick={handleProgressClick}
-              onMouseDown={handleProgressDragStart}
-            >
-              <div
-                className="absolute inset-0 rounded-full bg-[#1f66f4]"
-                style={{ width: `${progressWidth}%` }}
-              />
-              <div 
-                className="absolute w-3 h-3 bg-white dark:bg-gray-900 rounded-full shadow-md top-1/2 -translate-y-1/2 -translate-x-1/2 border-2 border-[#1f66f4] transition-transform duration-150 group-hover:scale-110"
-                style={{ left: `${progressWidth}%` }}
-              />
-               <div className="absolute inset-y-[-8px] inset-x-[-4px]" /> 
             </div>
-            <div className="flex justify-between text-xs text-muted-foreground px-1">
-              {/* Use localCurrentTime for smooth display while dragging */} 
-              <span>{formatTime(localCurrentTime)}</span> 
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
-           {/* Controls */} 
-          <div className="flex items-center justify-center space-x-6">
-            <button
-              onClick={handlePlayPrevious} // Use wrapped handler
-              className="p-2 hover:text-primary disabled:opacity-50 transition-colors"
-              aria-label="上一首"
-              disabled={isLoading || playlist.length <= 1}
-            >
-              <SkipBack className="h-6 w-6" />
-            </button>
-            <button
-              onClick={handleTogglePlay} // Use wrapped handler
-              className={`p-3 rounded-full ${isLoading ? 'bg-gray-200 dark:bg-gray-700 text-muted-foreground cursor-wait' : 'bg-primary/10 hover:bg-primary/20 text-primary'} transition-colors`}
-              aria-label={isPlaying ? "暂停" : "播放"}
-              disabled={isLoading && !error} 
-            >
-              {isLoading && !error ? (
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              ) : isPlaying ? (
-                <Pause className="h-6 w-6" />
-              ) : (
-                <Play className="h-6 w-6" />
-              )}
-            </button>
-            <button
-              onClick={handlePlayNext} // Use wrapped handler
-              className="p-2 hover:text-primary disabled:opacity-50 transition-colors"
-              aria-label="下一首"
-              disabled={isLoading || playlist.length <= 1}
-            >
-              <SkipForward className="h-6 w-6" />
-            </button>
-          </div>
-           {/* Volume */} 
-          <div className="flex items-center space-x-2 px-2">
-            <button
-              onClick={handleToggleMute} // Use wrapped handler
-              className="p-2 hover:text-[#1f66f4] transition-colors"
-              aria-label={isMuted ? "取消静音" : "静音"}
-            >
-              {isMuted || volume === 0 ? (
-                <VolumeX className="h-5 w-5" />
-              ) : (
-                <Volume2 className="h-5 w-5" />
-              )}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange} // Use wrapped handler
-              className="flex-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full accent-[#1f66f4] cursor-pointer"
-              aria-label="音量控制"
+            <SongInfoDisplay
+              title={currentTrack?.title}
+              artist={currentTrack?.artist}
+              album={currentTrack?.album}
             />
           </div>
+        </div>
+
+        <div 
+          className={`absolute inset-0 flex flex-col transition-all duration-300 ease-in-out p-4 pt-0 ${ 
+            isPlaylistViewOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+          }`}
+        >
+          <div className="flex items-center justify-between mb-2 flex-shrink-0 pt-4">
+            <h3 className="font-medium text-base">播放列表 ({playlist.length})</h3>
+          </div>
+          <ul className="flex-1 overflow-y-auto space-y-1 pr-1">
+            {playlist.map((song, index) => (
+              <li 
+                key={song.src + index}
+                onClick={() => playSongAtIndex(index)}
+                className={`flex items-center space-x-3 p-2 rounded-md cursor-pointer transition-colors ${ 
+                  index === currentSongIndex ? 'bg-primary/10 text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+              >
+                <div className="flex-shrink-0 w-5 text-center">
+                  {index === currentSongIndex && isPlaying ? (
+                     <Pause size={14} className="animate-pulse text-primary"/>
+                  ) : index === currentSongIndex ? (
+                     <Play size={14} className="text-primary"/>
+                  ) : (
+                     <span className="text-xs text-muted-foreground w-full inline-block">{index + 1}</span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium truncate ${index === currentSongIndex ? 'text-primary' : ''}`}>{song.title}</p>
+                  <p className={`text-xs truncate ${index === currentSongIndex ? 'text-primary/80' : 'text-muted-foreground'}`}>{song.artist}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="space-y-4 p-4 relative z-10 bg-card/80 backdrop-blur-sm rounded-lg">
+        <div className="space-y-1.5">
+           <div ref={progressRef} className="group relative h-1 cursor-pointer rounded-full bg-gray-200 dark:bg-gray-700 touch-none" onClick={handleProgressClick} onMouseDown={handleProgressDragStart}>
+             <div 
+               className="absolute inset-0 rounded-full" 
+               style={{ 
+                 backgroundColor: 'hsl(var(--primary))',
+                 width: `${progressWidth}%` 
+               }} 
+             /> 
+             <div className="absolute w-3 h-3 bg-white dark:bg-gray-900 rounded-full shadow-md top-1/2 -translate-y-1/2 -translate-x-1/2 border-2 border-primary transition-transform duration-150 group-hover:scale-110" style={{ left: `${progressWidth}%` }} />
+             <div className="absolute inset-y-[-8px] inset-x-[-4px]" />
+           </div>
+           <div className="flex justify-between text-xs text-muted-foreground">
+             <span>{formatTime(localCurrentTime)}</span>
+             <span>{formatTime(duration)}</span>
+           </div>
+        </div>
+        <div className="flex items-center justify-center space-x-6">
+           <button onClick={handlePlayPrevious} className="p-2 hover:text-primary disabled:opacity-50 transition-colors" aria-label="上一首" disabled={isLoading || playlist.length <= 1}><SkipBack className="h-6 w-6" /></button>
+           <button onClick={handleTogglePlay} className={`p-3 rounded-full ${isLoading ? 'bg-gray-200 dark:bg-gray-700 text-muted-foreground cursor-wait' : 'bg-primary/10 hover:bg-primary/20 text-primary'} transition-colors`} aria-label={isPlaying ? "暂停" : "播放"} disabled={isLoading && !error}>
+             {isLoading && !error ? <div className="h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" /> : isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+           </button>
+           <button onClick={handlePlayNext} className="p-2 hover:text-primary disabled:opacity-50 transition-colors" aria-label="下一首" disabled={isLoading || playlist.length <= 1}><SkipForward className="h-6 w-6" /></button>
+        </div>
+        <div className="flex items-center space-x-3">
+          <button onClick={handleToggleMute} className="p-1.5 hover:text-primary transition-colors" aria-label={isMuted ? "取消静音" : "静音"}>
+            {isMuted || volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+          </button>
+          <input type="range" min="0" max="1" step="0.01" value={isMuted ? 0 : volume} onChange={handleVolumeChange} className="flex-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full accent-primary cursor-pointer" style={{ accentColor: 'hsl(var(--primary))' }} aria-label="音量控制" />
+          <button 
+            onClick={() => setIsPlaylistViewOpen(!isPlaylistViewOpen)}
+            className={`p-1.5 rounded-md transition-colors ${isPlaylistViewOpen ? 'bg-primary/10 text-primary' : 'hover:text-primary'}`}
+            aria-label={isPlaylistViewOpen ? "关闭播放列表" : "打开播放列表"}
+          >
+            {isPlaylistViewOpen ? <X className="h-5 w-5" /> : <ListMusic className="h-5 w-5" />}
+          </button>
         </div>
       </div>
     </div>
