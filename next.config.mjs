@@ -5,6 +5,7 @@ const withMDX = createMDX();
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  devIndicators: false, // 关闭开发指示器
   // 在这里添加 images 配置
   images: {
     remotePatterns: [

@@ -68,8 +68,46 @@
   body {
     @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
     transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    background-image: url('/backgrounds/bg_light.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
   
+  .dark body {
+    background-image: url('/backgrounds/bg_dark.png');
+  }
+  
+  /* 毛玻璃效果 */
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .glass-effect-hover {
+    @apply transition-all duration-300 hover:bg-white/40 dark:hover:bg-gray-900/40;
+  }
+
+  /* 卡片毛玻璃效果 */
+  .card-glass {
+    @apply glass-effect glass-effect-hover;
+    @apply rounded-lg p-4;
+  }
+
+  /* 导航栏毛玻璃效果 */
+  .nav-glass {
+    @apply glass-effect;
+    @apply sticky top-0 z-50;
+  }
+
+  /* 按钮毛玻璃效果 */
+  .button-glass {
+    @apply glass-effect glass-effect-hover;
+    @apply px-4 py-2 rounded-md;
+  }
+
   /* 优化主题切换时的过渡效果 */
   * {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
