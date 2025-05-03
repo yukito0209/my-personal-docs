@@ -23,7 +23,7 @@ function GalleryHeader() {
           <Link
             href="https://www.sonystyle.com.cn/products/ilc/ilce_7cm2/ilce_7cm2_feature.html"
             target="_blank"
-            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50"
+            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 glass-effect"
           >
             <div className="flex items-start space-x-4">
               <div className="p-2 rounded-full bg-primary/10 text-primary">
@@ -45,7 +45,7 @@ function GalleryHeader() {
           <Link
             href="http://sigma-photo.com.cn/lenses/overview?id=24"
             target="_blank"
-            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50"
+            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 glass-effect"
           >
             <div className="flex items-start space-x-4">
               <div className="p-2 rounded-full bg-primary/10 text-primary">
@@ -67,7 +67,7 @@ function GalleryHeader() {
           <Link
             href="http://sigma-photo.com.cn/lenses/overview?id=189"
             target="_blank"
-            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50"
+            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 glass-effect"
           >
             <div className="flex items-start space-x-4">
               <div className="p-2 rounded-full bg-primary/10 text-primary">
@@ -89,7 +89,7 @@ function GalleryHeader() {
           <Link
             href="https://www.sonystyle.com.cn/products/lenses/sel40f25g/sel40f25g_feature.html"
             target="_blank"
-            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50"
+            className="group rounded-lg border bg-card p-4 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 glass-effect"
           >
             <div className="flex items-start space-x-4">
               <div className="p-2 rounded-full bg-primary/10 text-primary">

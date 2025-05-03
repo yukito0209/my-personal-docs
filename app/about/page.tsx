@@ -10,7 +10,7 @@ export default function AboutPage() {
     <main className="flex min-h-screen flex-col items-center justify-between">
       <div className="flex flex-1 flex-col items-center p-4 md:p-8">
         <div className="w-full max-w-3xl">
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="rounded-lg border bg-card p-6 shadow-sm glass-effect">
             <h1 className="text-2xl font-bold mb-4">关于本站</h1>
             <p className="text-muted-foreground mb-6">
               这是一个基于 Next.js 15 和 Fumadocs UI 构建的个人网站，集成了个人主页、文档系统、音乐播放器和相册功能。
@@ -30,7 +30,7 @@ export default function AboutPage() {
 
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">技术栈</h2>
-              <div className="rounded-lg border bg-primary/5 p-4">
+              <div className="rounded-lg border bg-primary/5 p-4 glass-effect">
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                   <li>Next.js 15.3.1 - React 框架</li>
                   <li>Fumadocs UI 15.2.12 - 文档系统框架</li>
@@ -43,7 +43,7 @@ export default function AboutPage() {
 
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">特别鸣谢</h2>
-              <div className="bg-card p-6 rounded-lg border">
+              <div className="bg-card p-6 rounded-lg border glass-effect">
                 <p className="text-muted-foreground mb-4">
                   本网站基于 Fumadocs 模板构建。Fumadocs 是一个优秀的文档框架，提供了针对 MDX 文档管理的强大支持，但缺少主页面和其他构建个人网站的必要模块。
                   因此，本网站在 Fumadocs 的基础上，添加了个人主页、音乐播放器、公告栏和相册等功能，并进行了样式调整和优化。
@@ -71,7 +71,7 @@ export default function AboutPage() {
 
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">支持本站</h2>
-              <div className="bg-card p-6 rounded-lg border">
+              <div className="bg-card p-6 rounded-lg border glass-effect">
                 <p className="text-muted-foreground mb-4">
                   如果你喜欢这个网站，欢迎通过以下方式支持我继续开发和维护。你的支持将帮助我持续改进网站，添加更多有趣的功能。
                 </p>
@@ -79,7 +79,7 @@ export default function AboutPage() {
                   <Link
                     href="https://afdian.net/@yukito0209"
                     target="_blank"
-                    className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50"
+                    className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50 glass-effect"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative flex items-center justify-center space-x-3">
@@ -102,7 +102,7 @@ export default function AboutPage() {
                   <Link
                     href="https://qr.alipay.com/fkx12345yourcode"
                     target="_blank"
-                    className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50"
+                    className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50 glass-effect"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative flex items-center justify-center space-x-3">
@@ -133,7 +133,7 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link
                   href="mailto:yukitoqaq@gmail.com"
-                  className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50"
+                  className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50 glass-effect"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative flex items-center space-x-3">
@@ -150,7 +150,7 @@ export default function AboutPage() {
                 <Link
                   href="https://github.com/yukito0209"
                   target="_blank"
-                  className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50"
+                  className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50 glass-effect"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative flex items-center space-x-3">
@@ -167,7 +167,7 @@ export default function AboutPage() {
                 <Link
                   href="https://space.bilibili.com/13845177"
                   target="_blank"
-                  className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50"
+                  className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50 glass-effect"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative flex items-center space-x-3">
