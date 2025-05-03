@@ -31,7 +31,7 @@ function GalleryHeader() {
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-base mb-1 group-hover:text-primary transition-colors">全画幅无反相机</h3>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   Sony Alpha 7C II
                 </p>
                 <div className="flex items-center text-sm text-primary">
@@ -53,7 +53,7 @@ function GalleryHeader() {
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-base mb-1 group-hover:text-primary transition-colors">大光圈人像定焦镜头</h3>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   Sigma 85mm F1.4 DG DN | Art
                 </p>
                 <div className="flex items-center text-sm text-primary">
@@ -75,7 +75,7 @@ function GalleryHeader() {
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-base mb-1 group-hover:text-primary transition-colors">标准变焦镜头</h3>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   Sigma 24-70mm F2.8 DG DN II | Art
                 </p>
                 <div className="flex items-center text-sm text-primary">
@@ -97,7 +97,7 @@ function GalleryHeader() {
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-base mb-1 group-hover:text-primary transition-colors">轻便定焦镜头</h3>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   Sony FE 40mm F2.5 G
                 </p>
                 <div className="flex items-center text-sm text-primary">

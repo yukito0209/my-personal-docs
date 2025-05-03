@@ -13,23 +13,15 @@ export const baseOptions: BaseLayoutProps = {
   nav: {
     title: (
       <>
-        {/* <svg
-          width="24"
-          height="24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-label="Logo"
-        >
-          <circle cx={12} cy={12} r={12} fill="currentColor" />
-        </svg> */}
         <img
-          src="https://avatars.githubusercontent.com/u/76610895?v=4" // 你的 GitHub 头像 URL
-          alt="Yukito's Avatar" // 添加描述性 alt 文本
-          width={24} // 保持和原来 svg 一致的宽度
-          height={24} // 保持和原来 svg 一致的高度
+          src="https://avatars.githubusercontent.com/u/76610895?v=4"
+          alt="Yukito's Avatar"
+          width={24}
+          height={24}
           style={{
             marginRight: '8px',
-            borderRadius: '50%', // 使图片呈圆形，更像头像
-            verticalAlign: 'middle' // 尝试让图片和文字垂直居中对齐
+            borderRadius: '50%',
+            verticalAlign: 'middle'
           }}
         />
         Yukito の 复式高层

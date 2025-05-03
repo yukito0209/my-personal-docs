@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Camera } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 interface Photo {
@@ -14,6 +14,29 @@ export function PhotoCard({ photo }: { photo: Photo }) {
   const [aspectRatio, setAspectRatio] = useState('1');
   const [isLoading, setIsLoading] = useState(true);
   const imageRef = useRef<HTMLImageElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [transform, setTransform] = useState<string>('perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)');
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const maxRotate = 16;
+    const rotateY = ((x - centerX) / centerX) * maxRotate;
+    const rotateX = -((y - centerY) / centerY) * maxRotate;
+    
+    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03,1.03,1.03)`);
+  };
+
+  const handleMouseLeave = () => {
+    setTransform('perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)');
+  };
 
   useEffect(() => {
     const img = new window.Image();
@@ -27,7 +50,13 @@ export function PhotoCard({ photo }: { photo: Photo }) {
   return (
     <>
       <div className="mb-4 break-inside-avoid">
-        <div className="group relative overflow-hidden rounded-lg">
+        <div
+          ref={cardRef}
+          className="group relative overflow-hidden rounded-lg transition-transform duration-150 will-change-transform"
+          style={{ transform, animationDuration: '0.125s' }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        >
           <div
             className="relative w-full"
             style={{
@@ -51,14 +80,17 @@ export function PhotoCard({ photo }: { photo: Photo }) {
               onLoad={() => setIsLoading(false)}
             />
           </div>
-          <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            <button
-              onClick={() => setIsFullscreen(true)}
-              className="rounded-full bg-white/20 p-2 backdrop-blur-sm transition-transform duration-300 hover:scale-110"
-            >
-              <Camera className="h-6 w-6 text-white" />
-            </button>
+
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute bottom-4 right-4">
+              <button
+                onClick={() => setIsFullscreen(true)}
+                className="flex items-center px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-colors"
+              >
+                <span className="text-sm mr-1 text-white">查看</span>
+                <ArrowUpRight className="w-4 h-4 text-white" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -106,4 +138,4 @@ export function PhotoCard({ photo }: { photo: Photo }) {
       )}
     </>
   );
-} 
+}
