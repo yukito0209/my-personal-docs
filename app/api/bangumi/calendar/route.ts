@@ -7,13 +7,13 @@ export async function GET() {
   console.log('[API Bangumi Calendar TEST] Route handler reached!');
   return NextResponse.json({ message: "Calendar API test successful!" });
   // --- End Test Code ---
-/* 
-  // Original code commented out for testing
+
+  // Restore original code
   const apiUrl = 'https://api.bgm.tv/calendar';
   const userAgent = 'yukito0209/my-personal-docs (https://github.com/yukito0209/my-personal-docs)'; // Recommended User-Agent format
 
   try {
-    console.log(`[API Bangumi Calendar] Fetching from ${apiUrl}`);
+    console.log(`[API Bangumi Calendar] Fetching from external API: ${apiUrl}`); // Added log
     const response = await fetch(apiUrl, {
       headers: {
         'User-Agent': userAgent,
@@ -23,26 +23,23 @@ export async function GET() {
       next: { revalidate: 3600 } 
     });
 
-    console.log(`[API Bangumi Calendar] Response status: ${response.status}`);
+    console.log(`[API Bangumi Calendar] External API Response status: ${response.status}`); // Added log
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[API Bangumi Calendar] Error fetching calendar data: ${response.status} ${response.statusText}`, errorText);
-      return NextResponse.json({ error: `Failed to fetch Bangumi calendar: ${response.statusText}` }, { status: response.status });
+      console.error(`[API Bangumi Calendar] Error fetching data from external API: ${response.status} ${response.statusText}`, errorText);
+      // Return a 502 Bad Gateway error if the external API fails
+      return NextResponse.json({ error: `Failed to fetch data from Bangumi API: ${response.statusText}` }, { status: 502 });
     }
 
     const data = await response.json();
-    console.log('[API Bangumi Calendar] Data fetched successfully.');
-    // console.log('[API Bangumi Calendar] Sample data:', JSON.stringify(data[0], null, 2)); // Log first day's data for inspection
-
-    // You might want to filter or transform the data here if needed
-    // For now, just return the raw data
-
+    console.log('[API Bangumi Calendar] External data fetched successfully.');
+    
+    // Return the actual data
     return NextResponse.json(data);
 
   } catch (error) {
-    console.error('[API Bangumi Calendar] Exception caught:', error);
+    console.error('[API Bangumi Calendar] Exception caught during external API fetch:', error); // Added log
     return NextResponse.json({ error: 'Internal server error while fetching Bangumi calendar' }, { status: 500 });
   }
-*/
 } 
