@@ -122,15 +122,35 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
       setCalendarDisplayError(null);
 
       try {
+        console.log("[BangumiWidget Client Fetch] Attempting fetch to /api/bangumi/calendar");
         const response = await fetch('/api/bangumi/calendar');
+        
+        // Log the response status received by the client
+        console.log(`[BangumiWidget Client Fetch] Received response status: ${response.status}`);
+        
         if (!response.ok) {
+          // Log the status again if it's not ok
+          console.error(`[BangumiWidget Client Fetch] Response not OK. Status: ${response.status}`);
           const errorData = await response.json().catch(() => ({ error: `Failed to fetch calendar (${response.status})` })); // Add fallback error parsing
           throw new Error(errorData.error || `Failed to fetch calendar (${response.status})`);
         }
-        const data: CalendarDay[] = await response.json();
-        processCalendarData(data);
+        
+        console.log("[BangumiWidget Client Fetch] Response OK. Attempting to parse JSON.");
+        const data: any = await response.json(); // Use any for now because it's test data
+        
+        // Log the received test data
+        console.log("[BangumiWidget Client Fetch] Received data:", data);
+        
+        // Since this is test data, we can't process it as CalendarDay[]
+        // Let's just set some dummy state or skip processing for now
+        // processCalendarData(data); // This would fail
+        setCurrentWeekday('测试成功'); // Indicate success
+        setTodaysData([]); // Set empty array to avoid errors downstream
+        setCalendarDisplayError(null);
+
       } catch (err) {
-        console.error("[BangumiWidget] Error fetching calendar data:", err);
+        // Log the final error that caused the catch block
+        console.error("[BangumiWidget Client Fetch] Error caught:", err);
         setCalendarDisplayError(err instanceof Error ? err.message : "加载放送日历失败");
         setTodaysData([]); // Clear data on error
       } finally {
