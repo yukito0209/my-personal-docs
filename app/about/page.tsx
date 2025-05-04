@@ -28,7 +28,7 @@ export default function AboutPage() {
                 <li>支持浅色/深色模式切换，并带有平滑过渡动画</li>
                 <li>全局应用霞鹜文楷 (LXGW WenKai) 字体，提升阅读体验</li>
                 <li>多处采用毛玻璃 (Frosted Glass) UI 效果，增强视觉层次感</li>
-                <li>实时公告栏（首页右侧），展示网站动态</li>
+                <li>基于 Bangumi API 的「每日新番放送」和「我的追番」列表</li>
               </ul>
             </section>
 
