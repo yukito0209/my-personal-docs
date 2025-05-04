@@ -19,7 +19,7 @@ A modern personal homepage and documentation system built with Next.js and Fumad
 - Education history
 - Interest showcase
 - Portfolio display
-- Real-time announcement board
+- **Bangumi Daily Calendar** (Replaces announcement board)
 
 ### 🎵 Music Player
 - **Custom music player based on React Context**

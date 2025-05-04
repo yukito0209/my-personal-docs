@@ -6,8 +6,62 @@ import EducationCard from './components/EducationCard';
 import InterestsSection from './components/InterestCard';
 import Footer from '@/app/components/Footer';
 import { CustomMusicPlayer } from '@/app/components/CustomMusicPlayer';
+import BangumiWidget from './components/BangumiWidget';
 
-export default function HomePage() {
+interface Weekday {
+  en: string; cn: string; ja: string; id: number;
+}
+
+interface CalendarItem {
+  id: number; url: string; type: number; name: string; name_cn: string; summary: string; air_date: string; air_weekday: number; rating: any; rank: number | null; images: any; collection: any;
+}
+
+interface CalendarDay {
+  weekday: Weekday; items: CalendarItem[];
+}
+
+async function fetchBangumiCalendar(): Promise<{ data: CalendarDay[] | null; error: string | null }> {
+  const baseUrl = process.env.NODE_ENV === 'production' 
+                 ? process.env.NEXT_PUBLIC_BASE_URL
+                 : 'http://localhost:3000'; 
+  
+  if (process.env.NODE_ENV === 'production' && !baseUrl) {
+      console.error('[HomePage] Error: NEXT_PUBLIC_BASE_URL environment variable is not set for production.');
+      return { data: null, error: '服务器配置错误，无法确定API基础URL' };
+  }
+
+  if (!baseUrl) {
+     console.error('[HomePage] Error: Base URL could not be determined.');
+     return { data: null, error: '无法确定API基础URL' };
+  }
+
+  const absoluteApiUrl = `${baseUrl}/api/bangumi/calendar`;
+
+  try {
+    console.log(`[HomePage] Fetching Bangumi Calendar from: ${absoluteApiUrl}`);
+    const response = await fetch(absoluteApiUrl, { next: { revalidate: 3600 } }); 
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[HomePage] Error fetching calendar data: ${response.status} ${response.statusText}`, errorText);
+      return { data: null, error: `未能加载放送日历 (${response.status})` };
+    }
+    const data: CalendarDay[] = await response.json();
+    console.log(`[HomePage] Successfully fetched Bangumi calendar data.`);
+    return { data, error: null };
+  } catch (error) {
+    console.error('[HomePage] Exception fetching calendar data:', error);
+    const errorMessage = error instanceof Error ? error.message : '未知网络错误';
+    if (error instanceof TypeError && error.message.includes('fetch failed')) {
+         return { data: null, error: `网络请求失败: ${errorMessage}` };
+    }
+    return { data: null, error: `加载放送日历时发生内部错误: ${errorMessage}` };
+  }
+}
+
+export default async function HomePage() {
+  const { data: bangumiData, error: bangumiError } = await fetchBangumiCalendar();
+
   return (
     <main className="min-h-screen">
       <div className="container mx-auto px-4">
@@ -147,43 +201,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 右侧公告栏 */}
+          {/* 右侧 Bangumi Widget */}
           <div className="w-full md:w-[300px] md:sticky md:top-4 md:self-start">
-            <div className="rounded-lg border bg-card shadow-sm glass-effect h-[600px]">
-              <div className="p-4 h-full flex flex-col">
-                <div className="flex items-center space-x-2 mb-4">
-                  <Bell className="h-5 w-5 text-primary" />
-                  <h3 className="font-medium">最新公告</h3>
-                </div>
-                <div className="space-y-3 flex-1 overflow-y-auto">
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
-                    <p className="text-sm font-medium mb-1">🎉 UI & 字体更新</p>
-                    <p className="text-xs text-muted-foreground">全站字体更换为霞鹜文楷，提升阅读体验。多处界面应用毛玻璃效果。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
-                  </div>
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
-                    <p className="text-sm font-medium mb-1">✨ 功能增强</p>
-                    <p className="text-xs text-muted-foreground">导航栏新增 GitHub 仓库链接。更新了关于页面内容。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
-                  </div>
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
-                    <p className="text-sm font-medium mb-1">🖼️ 相册与页脚</p>
-                    <p className="text-xs text-muted-foreground">相册页面添加页脚。美化了全站页脚样式。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
-                  </div>
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
-                    <p className="text-sm font-medium mb-1">🎨 细节优化</p>
-                    <p className="text-xs text-muted-foreground">优化了深色/浅色模式切换的背景过渡效果。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2025-05-03</p>
-                  </div>
-                  <div className="p-3 rounded-md bg-black/5 dark:bg-white/5 announcement-card">
-                    <p className="text-sm font-medium mb-1">🎵 音乐播放器</p>
-                    <p className="text-xs text-muted-foreground">音乐播放器功能上线，支持本地音乐播放与专辑封面。</p>
-                    <p className="text-xs text-muted-foreground mt-1">2025-05-01</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <BangumiWidget initialCalendarData={bangumiData} calendarError={bangumiError} />
           </div>
         </div>
       </div>
