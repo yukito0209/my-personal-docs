@@ -6,22 +6,7 @@ import EducationCard from './components/EducationCard';
 import InterestsSection from './components/InterestCard';
 import Footer from '@/app/components/Footer';
 import { CustomMusicPlayer } from '@/app/components/CustomMusicPlayer';
-import dynamic from 'next/dynamic';
-
-// Dynamically import BangumiWidget only on the client-side
-const BangumiWidget = dynamic(
-  () => import('./components/BangumiWidget'),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="rounded-lg border bg-card shadow-sm glass-effect h-[600px]">
-        <div className="p-4 h-full flex items-center justify-center">
-          <p className='text-sm text-muted-foreground'>加载 Bangumi 小部件...</p>
-        </div>
-      </div>
-    )
-  }
-);
+import DynamicBangumiWidget from './components/DynamicBangumiWidget';
 
 interface Weekday {
   en: string; cn: string; ja: string; id: number;
@@ -177,7 +162,7 @@ export default async function HomePage() {
 
           {/* 右侧 Bangumi Widget */}
           <div className="w-full md:w-[300px] md:sticky md:top-4 md:self-start">
-            <BangumiWidget initialCalendarData={null} calendarError={null} />
+            <DynamicBangumiWidget />
           </div>
         </div>
       </div>

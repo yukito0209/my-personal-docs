@@ -292,15 +292,11 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
   
   let calculatedTitleText;
   if (viewMode === 'calendar') {
-    // ***** TEMPORARY SIMPLIFICATION *****
-    // If weekday hasn't been loaded yet, show a placeholder
-    if (!currentWeekday) {
-      calculatedTitleText = `每日新番放送<br/>${currentDateStr} (加载中...)`;
-    } else {
-      const titleWeekdayPart = ` ${currentWeekday}`; // Weekday is loaded, use it
-      calculatedTitleText = `每日新番放送<br/>${currentDateStr}${titleWeekdayPart}`;
-    }
-    // ***** END TEMPORARY SIMPLIFICATION *****
+    // ***** REMOVE TEMPORARY SIMPLIFICATION *****
+    // Restore original logic
+    const titleWeekdayPart = currentWeekday ? ` ${currentWeekday}` : ''; 
+    calculatedTitleText = `每日新番放送<br/>${currentDateStr}${titleWeekdayPart}`;
+    // ***** END REMOVE TEMPORARY SIMPLIFICATION *****
   } else {
     calculatedTitleText = "我的追番";
   }
