@@ -29,26 +29,33 @@ async function fetchBangumiCalendar(): Promise<{ data: CalendarDay[] | null; err
                  : (process.env.NEXT_PUBLIC_BASE_URL || '');
 
   if (!baseUrl) {
-     console.error('[HomePage] Error: Base URL could not be determined.');
+     console.error('[HomePage FetchCalendar] Error: Base URL could not be determined.');
      return { data: null, error: '无法确定API基础URL' };
   }
 
   const absoluteApiUrl = `${baseUrl}/api/bangumi/calendar`;
 
   try {
-    console.log(`[HomePage] Fetching Bangumi Calendar from: ${absoluteApiUrl}`);
+    // Add logging before fetch
+    console.log(`[HomePage FetchCalendar] Attempting server-side fetch from: ${absoluteApiUrl}`);
+    
     const response = await fetch(absoluteApiUrl, { next: { revalidate: 3600 } }); 
+
+    // Add logging after fetch
+    console.log(`[HomePage FetchCalendar] Fetch response status: ${response.status}`);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[HomePage] Error fetching calendar data: ${response.status} ${response.statusText}`, errorText);
+      // Log the specific error from the fetch attempt
+      console.error(`[HomePage FetchCalendar] Error fetching calendar data from internal API: ${response.status} ${response.statusText}`, errorText);
       return { data: null, error: `未能加载放送日历 (${response.status})` };
     }
     const data: CalendarDay[] = await response.json();
-    console.log(`[HomePage] Successfully fetched Bangumi calendar data.`);
+    console.log(`[HomePage FetchCalendar] Successfully fetched and parsed calendar data from internal API.`);
     return { data, error: null };
   } catch (error) {
-    console.error('[HomePage] Exception fetching calendar data:', error);
+    // Log any exception during the fetch process
+    console.error('[HomePage FetchCalendar] Exception during internal API fetch:', error);
     const errorMessage = error instanceof Error ? error.message : '未知网络错误';
     if (error instanceof TypeError && error.message.includes('fetch failed')) {
          return { data: null, error: `网络请求失败: ${errorMessage}` };
