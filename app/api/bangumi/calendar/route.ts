@@ -14,8 +14,8 @@ export async function GET() {
         'User-Agent': userAgent,
         'Accept': 'application/json', // Request JSON response
       },
-      // Optional: Revalidate cache every hour, adjust as needed
-      next: { revalidate: 3600 } 
+      // Disable fetch caching for this request to always get fresh data
+      cache: 'no-store'
     });
 
     console.log(`[API Bangumi Calendar] External API Response status: ${response.status}`); // Added log
