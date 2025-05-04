@@ -289,10 +289,18 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
   console.log("[BangumiWidget Render] Current viewMode:", viewMode);
   console.log("[BangumiWidget Render] Current currentWeekday state:", currentWeekday);
   console.log("[BangumiWidget Render] Current currentDateStr state:", currentDateStr);
-  const titleWeekdayPart = currentWeekday ? ` ${currentWeekday}` : '';
+  
   let calculatedTitleText;
   if (viewMode === 'calendar') {
-    calculatedTitleText = `每日新番放送<br/>${currentDateStr}${titleWeekdayPart}`;
+    // ***** TEMPORARY SIMPLIFICATION *****
+    // If weekday hasn't been loaded yet, show a placeholder
+    if (!currentWeekday) {
+      calculatedTitleText = `每日新番放送<br/>${currentDateStr} (加载中...)`;
+    } else {
+      const titleWeekdayPart = ` ${currentWeekday}`; // Weekday is loaded, use it
+      calculatedTitleText = `每日新番放送<br/>${currentDateStr}${titleWeekdayPart}`;
+    }
+    // ***** END TEMPORARY SIMPLIFICATION *****
   } else {
     calculatedTitleText = "我的追番";
   }
