@@ -3,12 +3,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic'; // Ensure the route is re-fetched on every request
 
 export async function GET() {
-  // --- Start Test Code ---
-  console.log('[API Bangumi Calendar TEST] Route handler reached!');
-  return NextResponse.json({ message: "Calendar API test successful!" });
-  // --- End Test Code ---
 
-  // Restore original code
   const apiUrl = 'https://api.bgm.tv/calendar';
   const userAgent = 'yukito0209/my-personal-docs (https://github.com/yukito0209/my-personal-docs)'; // Recommended User-Agent format
 
