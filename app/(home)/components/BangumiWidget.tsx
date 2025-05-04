@@ -156,19 +156,24 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
       const todayEntry = calendarData.find(day => day.weekday.id === bangumiDayId);
 
       if (todayEntry) {
+        console.log("[BangumiWidget processCalendarData] Found today's entry. Setting weekday to:", todayEntry.weekday.cn); // Log before setting state
         setTodaysData(todayEntry.items);
         setCurrentWeekday(todayEntry.weekday.cn);
       } else {
+        console.log("[BangumiWidget processCalendarData] No entry found for today."); // Log if no entry
         setTodaysData([]);
         // Still try to find weekday name even if no items
         const weekdayEntry = calendarData.find(day => day.weekday.id === bangumiDayId);
-        setCurrentWeekday(weekdayEntry?.weekday.cn || ''); 
+        const foundWeekday = weekdayEntry?.weekday.cn || '';
+        console.log("[BangumiWidget processCalendarData] Setting weekday (no items) to:", foundWeekday); // Log before setting state
+        setCurrentWeekday(foundWeekday); 
       }
       setCalendarDisplayError(null); // Clear error if processed successfully
     } catch (err) {
-      console.error("Error processing Calendar data:", err);
+      console.error("[BangumiWidget processCalendarData] Error processing Calendar data:", err);
       setCalendarDisplayError("处理放送数据时出错");
       setTodaysData([]); // Clear data on processing error
+      setCurrentWeekday("处理错误"); // Set weekday state on error too
     }
   };
 
@@ -281,13 +286,17 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
   };
 
   // Determine title based on view mode
-  let titleText;
+  console.log("[BangumiWidget Render] Current viewMode:", viewMode);
+  console.log("[BangumiWidget Render] Current currentWeekday state:", currentWeekday);
+  console.log("[BangumiWidget Render] Current currentDateStr state:", currentDateStr);
+  const titleWeekdayPart = currentWeekday ? ` ${currentWeekday}` : '';
+  let calculatedTitleText;
   if (viewMode === 'calendar') {
-    const titleWeekdayPart = currentWeekday ? ` ${currentWeekday}` : '';
-    titleText = `每日新番放送<br/>${currentDateStr}${titleWeekdayPart}`; 
+    calculatedTitleText = `每日新番放送<br/>${currentDateStr}${titleWeekdayPart}`;
   } else {
-    titleText = "我的追番";
+    calculatedTitleText = "我的追番";
   }
+  console.log("[BangumiWidget Render] Calculated titleText:", calculatedTitleText);
 
   return (
     <div className="rounded-lg border bg-card shadow-sm glass-effect h-[600px]">
@@ -296,10 +305,10 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
         <div className="flex items-center justify-between mb-3 flex-shrink-0">
           <div className="flex items-center space-x-2 min-w-0 mr-2 h-12">
             {viewMode === 'calendar' ? <CalendarClock className="h-5 w-5 text-primary flex-shrink-0" /> : <User className="h-5 w-5 text-primary flex-shrink-0" /> }
-            <h3 className="font-medium text-base md:text-sm lg:text-base leading-tight" title={titleText}>
+            <h3 className="font-medium text-base md:text-sm lg:text-base leading-tight" title={calculatedTitleText.replace('<br/>', ' ')}>
               {viewMode === 'calendar'
-                ? <span dangerouslySetInnerHTML={{ __html: titleText.replace(' (', '<br/>(') }} />
-                : titleText
+                ? <span dangerouslySetInnerHTML={{ __html: calculatedTitleText }} />
+                : calculatedTitleText
               }
             </h3>
           </div>
