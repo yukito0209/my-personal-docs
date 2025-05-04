@@ -21,14 +21,12 @@ interface CalendarDay {
 }
 
 async function fetchBangumiCalendar(): Promise<{ data: CalendarDay[] | null; error: string | null }> {
-  const baseUrl = process.env.NODE_ENV === 'production' 
-                 ? process.env.NEXT_PUBLIC_BASE_URL
-                 : 'http://localhost:3000'; 
-  
-  if (process.env.NODE_ENV === 'production' && !baseUrl) {
-      console.error('[HomePage] Error: NEXT_PUBLIC_BASE_URL environment variable is not set for production.');
-      return { data: null, error: '服务器配置错误，无法确定API基础URL' };
-  }
+  // Detect if running on the server (process.env.NODE_ENV is available server-side)
+  const isServer = typeof window === 'undefined';
+  // Use localhost:3000 for server-side API calls, otherwise use the public base URL for client-side (if needed elsewhere)
+  const baseUrl = isServer 
+                 ? 'http://localhost:3000' 
+                 : (process.env.NEXT_PUBLIC_BASE_URL || '');
 
   if (!baseUrl) {
      console.error('[HomePage] Error: Base URL could not be determined.');
