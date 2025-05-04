@@ -130,21 +130,29 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('/backgrounds/bg_dark.png');
-    background-size: cover;
+    width: 100vw;
+    height: 100vh;
     background-position: center;
-    background-attachment: fixed;
+    background-size: cover;
     background-repeat: no-repeat;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out; /* 只过渡 opacity */
-    pointer-events: none;
-    z-index: -1;
+    z-index: -1; 
+    opacity: 0.15; /* Reduced opacity */
+    transition: background-image 0.5s ease-in-out, opacity 0.5s ease-in-out;
+
+    /* Light Mode Background: Prefer WebP, fallback to PNG */
+    background-image: image-set(
+      url('/backgrounds/bg_light.webp') type('image/webp'),
+      url('/backgrounds/bg_light.png') type('image/png') 
+    );
   }
   
   .dark body::before {
-    opacity: 1;
+    /* Dark Mode Background: Prefer WebP, fallback to PNG */
+    background-image: image-set(
+      url('/backgrounds/bg_dark.webp') type('image/webp'),
+      url('/backgrounds/bg_dark.png') type('image/png') 
+    );
+    opacity: 0.2; /* Slightly higher opacity for dark mode perhaps */
   }
   
   /* 毛玻璃效果 - 添加背景色和阴影过渡 */
