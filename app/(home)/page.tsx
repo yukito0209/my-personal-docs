@@ -20,53 +20,7 @@ interface CalendarDay {
   weekday: Weekday; items: CalendarItem[];
 }
 
-async function fetchBangumiCalendar(): Promise<{ data: CalendarDay[] | null; error: string | null }> {
-  // Detect if running on the server (process.env.NODE_ENV is available server-side)
-  const isServer = typeof window === 'undefined';
-  // Use localhost:3000 for server-side API calls, otherwise use the public base URL for client-side (if needed elsewhere)
-  const baseUrl = isServer 
-                 ? 'http://localhost:3000' 
-                 : (process.env.NEXT_PUBLIC_BASE_URL || '');
-
-  if (!baseUrl) {
-     console.error('[HomePage FetchCalendar] Error: Base URL could not be determined.');
-     return { data: null, error: '无法确定API基础URL' };
-  }
-
-  const absoluteApiUrl = `${baseUrl}/api/bangumi/calendar`;
-
-  try {
-    // Add logging before fetch
-    console.log(`[HomePage FetchCalendar] Attempting server-side fetch from: ${absoluteApiUrl}`);
-    
-    const response = await fetch(absoluteApiUrl, { next: { revalidate: 3600 } }); 
-
-    // Add logging after fetch
-    console.log(`[HomePage FetchCalendar] Fetch response status: ${response.status}`);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      // Log the specific error from the fetch attempt
-      console.error(`[HomePage FetchCalendar] Error fetching calendar data from internal API: ${response.status} ${response.statusText}`, errorText);
-      return { data: null, error: `未能加载放送日历 (${response.status})` };
-    }
-    const data: CalendarDay[] = await response.json();
-    console.log(`[HomePage FetchCalendar] Successfully fetched and parsed calendar data from internal API.`);
-    return { data, error: null };
-  } catch (error) {
-    // Log any exception during the fetch process
-    console.error('[HomePage FetchCalendar] Exception during internal API fetch:', error);
-    const errorMessage = error instanceof Error ? error.message : '未知网络错误';
-    if (error instanceof TypeError && error.message.includes('fetch failed')) {
-         return { data: null, error: `网络请求失败: ${errorMessage}` };
-    }
-    return { data: null, error: `加载放送日历时发生内部错误: ${errorMessage}` };
-  }
-}
-
 export default async function HomePage() {
-  const { data: bangumiData, error: bangumiError } = await fetchBangumiCalendar();
-
   return (
     <main className="min-h-screen">
       <div className="container mx-auto px-4">
@@ -208,7 +162,7 @@ export default async function HomePage() {
 
           {/* 右侧 Bangumi Widget */}
           <div className="w-full md:w-[300px] md:sticky md:top-4 md:self-start">
-            <BangumiWidget initialCalendarData={bangumiData} calendarError={bangumiError} />
+            <BangumiWidget initialCalendarData={null} calendarError={null} />
           </div>
         </div>
       </div>

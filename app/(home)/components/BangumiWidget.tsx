@@ -83,8 +83,9 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
   const [todaysData, setTodaysData] = useState<CalendarItem[] | null>(null);
   const [currentWeekday, setCurrentWeekday] = useState('');
   const [currentDateStr, setCurrentDateStr] = useState('');
-  const [calendarLoading] = useState(!initialCalendarData && !calendarError); // Use initial props directly
-  const [calendarDisplayError, setCalendarDisplayError] = useState<string | null>(calendarError); // Local error state
+  // Calendar loading state now managed internally
+  const [calendarLoading, setCalendarLoading] = useState(true);
+  const [calendarDisplayError, setCalendarDisplayError] = useState<string | null>(calendarError); // Still use initial error prop if provided
 
   // Watching State
   const [watchingData, setWatchingData] = useState<WatchingItem[] | null>(null);
@@ -92,38 +93,79 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
   const [watchingError, setWatchingError] = useState<string | null>(null);
 
   // --- Effects ---
-  // Effect to process initial calendar data and set date/weekday
+  // Effect to set initial date string
   useEffect(() => {
     const today = new Date();
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, '0');
     const day = today.getDate().toString().padStart(2, '0');
     setCurrentDateStr(`${year}年${month}月${day}日`);
+  }, []);
 
-    if (initialCalendarData) {
-      try {
-        const jsDay = today.getDay();
-        const bangumiDayId = jsDay === 0 ? 7 : jsDay;
-        const todayEntry = initialCalendarData.find(day => day.weekday.id === bangumiDayId);
-
-        if (todayEntry) {
-          setTodaysData(todayEntry.items);
-          setCurrentWeekday(todayEntry.weekday.cn);
-        } else {
-          setTodaysData([]);
-          const weekdayEntry = initialCalendarData.find(day => day.weekday.id === bangumiDayId);
-          setCurrentWeekday(weekdayEntry?.weekday.cn || '');
-        }
-        setCalendarDisplayError(null); // Clear error if processed successfully
-      } catch (err) {
-         console.error("Error processing Calendar data:", err);
-         setCalendarDisplayError("处理放送数据时出错");
+  // Effect to fetch calendar data client-side if not provided initially
+  useEffect(() => {
+    async function fetchCalendar() {
+      if (initialCalendarData) {
+        // If initial data exists (though we removed server-side fetch, keeping this logic for potential future use)
+        processCalendarData(initialCalendarData);
+        setCalendarLoading(false);
+        return;
       }
-    } else {
-       // Handle case where initial data is null but no error (maybe still loading upstream?)
-       if (!calendarError) console.log("Calendar: No initial data or error provided.");
+      if (calendarError) {
+          // If an initial error was passed, don't try to fetch
+          setCalendarLoading(false);
+          return;
+      }
+      
+      console.log("[BangumiWidget] Fetching calendar data client-side...");
+      setCalendarLoading(true);
+      setCalendarDisplayError(null);
+
+      try {
+        const response = await fetch('/api/bangumi/calendar');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: `Failed to fetch calendar (${response.status})` })); // Add fallback error parsing
+          throw new Error(errorData.error || `Failed to fetch calendar (${response.status})`);
+        }
+        const data: CalendarDay[] = await response.json();
+        processCalendarData(data);
+      } catch (err) {
+        console.error("[BangumiWidget] Error fetching calendar data:", err);
+        setCalendarDisplayError(err instanceof Error ? err.message : "加载放送日历失败");
+        setTodaysData([]); // Clear data on error
+      } finally {
+        setCalendarLoading(false);
+      }
     }
+
+    fetchCalendar();
+  // Depend on initial props in case they change (though unlikely now)
   }, [initialCalendarData, calendarError]);
+
+  // Helper function to process calendar data (extracted from previous effect)
+  const processCalendarData = (calendarData: CalendarDay[]) => {
+    try {
+      const today = new Date();
+      const jsDay = today.getDay();
+      const bangumiDayId = jsDay === 0 ? 7 : jsDay; // Bangumi uses 1-7 (Mon-Sun), JS uses 0-6 (Sun-Sat)
+      const todayEntry = calendarData.find(day => day.weekday.id === bangumiDayId);
+
+      if (todayEntry) {
+        setTodaysData(todayEntry.items);
+        setCurrentWeekday(todayEntry.weekday.cn);
+      } else {
+        setTodaysData([]);
+        // Still try to find weekday name even if no items
+        const weekdayEntry = calendarData.find(day => day.weekday.id === bangumiDayId);
+        setCurrentWeekday(weekdayEntry?.weekday.cn || ''); 
+      }
+      setCalendarDisplayError(null); // Clear error if processed successfully
+    } catch (err) {
+      console.error("Error processing Calendar data:", err);
+      setCalendarDisplayError("处理放送数据时出错");
+      setTodaysData([]); // Clear data on processing error
+    }
+  };
 
   // --- Data Fetching ---
   const fetchWatchingData = useCallback(async () => {
@@ -161,6 +203,7 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
 
   // --- Render Logic ---
   const renderCalendarList = () => {
+    // Updated loading/error checks to use internal state
     if (calendarLoading) return <div className="flex-1 flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
     if (calendarDisplayError) return <div className="flex-1 flex flex-col items-center justify-center text-center px-4"><AlertCircle className="h-8 w-8 text-red-500 mb-2" /><p className="text-sm font-medium text-red-600">加载放送日历失败</p><p className="text-xs text-muted-foreground mt-1">{calendarDisplayError}</p></div>;
     if (!todaysData || todaysData.length === 0) return <div className="flex-1 flex items-center justify-center"><p className="text-sm text-muted-foreground">今天似乎没有新番放送</p></div>;
@@ -236,8 +279,7 @@ export default function BangumiWidget({ initialCalendarData, calendarError }: Ba
   let titleText;
   if (viewMode === 'calendar') {
     const titleWeekdayPart = currentWeekday ? ` ${currentWeekday}` : '';
-    // titleText = `今日放送 (${currentDateStr}${titleWeekdayPart})`;
-    titleText = `每日新番放送<br/>${currentDateStr}${titleWeekdayPart}`; // Using the title you added
+    titleText = `每日新番放送<br/>${currentDateStr}${titleWeekdayPart}`; 
   } else {
     titleText = "我的追番";
   }
