@@ -6,7 +6,22 @@ import EducationCard from './components/EducationCard';
 import InterestsSection from './components/InterestCard';
 import Footer from '@/app/components/Footer';
 import { CustomMusicPlayer } from '@/app/components/CustomMusicPlayer';
-import BangumiWidget from './components/BangumiWidget';
+import dynamic from 'next/dynamic';
+
+// Dynamically import BangumiWidget only on the client-side
+const BangumiWidget = dynamic(
+  () => import('./components/BangumiWidget'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="rounded-lg border bg-card shadow-sm glass-effect h-[600px]">
+        <div className="p-4 h-full flex items-center justify-center">
+          <p className='text-sm text-muted-foreground'>加载 Bangumi 小部件...</p>
+        </div>
+      </div>
+    )
+  }
+);
 
 interface Weekday {
   en: string; cn: string; ja: string; id: number;
