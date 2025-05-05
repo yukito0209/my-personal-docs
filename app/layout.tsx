@@ -11,6 +11,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       <head>
         <link rel="preload" href="/fonts/LXGWWenKai-Regular.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/LXGWWenKai-Medium.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
+        <link rel="preload" href="/backgrounds/bg_light.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/backgrounds/bg_dark.webp" as="image" type="image/webp" />
       </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider theme={{ defaultTheme: 'system', enableSystem: true }}>
