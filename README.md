@@ -2,57 +2,28 @@
 
 [English](./README_EN.md) | 简体中文
 
-这是我的个人网站项目，使用 Next.js 和 Fumadocs UI 构建的现代化个人主页和文档系统。
+这是我的个人网站项目，使用 Next.js 和 Fumadocs UI 构建的现代化个人主页和文档系统。你也可以用它作为一个框架，构建自己的个人网站。
 
 ## 🌟 功能特点
 
-### 🎨 UI 与交互
-- 响应式设计，支持移动端和桌面端
-- **多处应用毛玻璃 (Frosted Glass) UI 效果**
-- **全局应用霞鹜文楷 (LXGW WenKai) 字体**
-- **自定义亮/暗模式切换按钮**
-- **深/浅色模式平滑背景图片过渡**
-- **照片卡片悬停发光效果**
-
-### 🏠 个人主页
-- 个人信息展示
-- 教育经历展示
-- 兴趣爱好展示
-- 作品集展示
-- **Bangumi 每日放送** (替代原公告栏)
-
-### 🎵 音乐播放器
-- **基于 React Context 的定制化音乐播放器**
-- 支持本地音乐文件播放 (MP3, WAV, OGG, FLAC)
-- 专辑封面显示
-- 播放控制（播放/暂停、上一首/下一首）
-- 音量控制与进度条
-
-### 📚 文档系统
-- 基于 Fumadocs 的文档管理
-- 支持 MDX 格式
-- 文档搜索功能
-- **带毛玻璃效果的内容区域与目录**
-- **导航栏添加 GitHub 仓库链接**
-
-### 🖼️ 相册功能
-- 瀑布流布局展示
-- **图片灯箱查看器 (支持键盘导航)**
-- 支持高清图片与图片懒加载
-- 响应式设计
-
-### 🦶 全局页脚
-- 显示版权和相关链接
+- 响应式设计的个人主页，展示个人信息和教育经历
+- 基于 Fumadocs 的文档系统，支持 MDX 格式与搜索
+- 定制化本地音乐播放器，支持专辑封面显示
+- 瀑布流布局的相册画廊
+- 支持浅色/深色模式切换，并带有平滑过渡动画
+- 全局应用霞鹜文楷 (LXGW WenKai) 字体，提升阅读体验
+- 多处采用毛玻璃 (Frosted Glass) UI 效果，增强视觉层次感
+- 基于 Bangumi API 的「每日新番放送」和「我的追番」列表
 
 ## 🛠️ 技术栈
 
-- **框架**: Next.js 15.3.1
-- **UI 组件**: Fumadocs UI 15.2.12
-- **样式**: TailwindCSS 4.1.4
-- **文档**: Fumadocs MDX 11.6.1
-- **图标**: Lucide React 0.503.0, **Simple Icons (品牌 SVG 图标库)**
-- **类型检查**: TypeScript 5.8.3
-- **状态管理**: **React Context API (用于主题和音乐播放器)**
+- **Next.js 15.3.1** - React 应用框架
+- **Fumadocs UI 15.2.12 & MDX 11.6.1** - 文档系统核心
+- **TailwindCSS 4.1.4** - 原子化 CSS 框架
+- **TypeScript 5.8.3** - 强类型 JavaScript 超集
+- **Lucide React 0.503.0** - 图标库
+- **Simple Icons** - 品牌 SVG 图标库
+- **React Context API** - 用于状态管理（如主题、音乐播放器）
 
 ## 📦 项目结构
 
@@ -78,8 +49,8 @@ my-personal-docs/
 
 ### 环境要求
 
-- Node.js 18.0 或更高版本
-- npm 或 yarn
+- **Node.js 20.0 或更高版本**
+- **npm**
 
 ### 安装
 
@@ -106,9 +77,6 @@ npm run dev
 ```bash
 # 构建生产版本
 npm run build
-
-# 启动生产服务器
-npm run start
 ```
 
 ## 🔧 配置说明
@@ -121,36 +89,35 @@ npm run start
 - OGG
 - FLAC
 
+音乐文件不易过大，避免网页播放加载时间过长。
+
 ### 相册
 
 将图片文件放置在 `public/photos` 目录下，建议进行适当的图片压缩以提升加载性能。
+
+推荐使用 [Squoosh](https://squoosh.app/) 将图片压缩为 webp 格式。
 
 ### 文档
 
 文档使用 MDX 格式，放置在 `content/docs` 目录下。
 
-## 📝 开发注意事项
-
-1. 图片优化
-   - 使用 Next.js 的 Image 组件进行图片优化
-   - 大图片建议使用 CDN 加速
-   - 实现图片懒加载
-
-2. 性能优化
-   - 组件适当拆分
-   - 使用 React.memo() 优化渲染性能
-   - 图片和音频文件进行合理压缩
-   - 使用 Next.js 的 Turbo 模式进行开发
-
-3. 安全性
-   - API 路由添加适当的验证
-   - 避免敏感信息泄露
-   - 使用环境变量管理敏感配置
+具体使用方法请参考：https://fumadocs.dev/docs/mdx
 
 ## 📄 许可证
 
-MIT License
+[MIT License](https://github.com/yukito0209/my-personal-docs/blob/master/LICENSE)
 
-## 🤝 贡献指南
+## 🤝 特别鸣谢
 
-欢迎提交 Issue 和 Pull Request 来帮助改进项目。
+本项目的成功实现离不开以下项目/服务商的支持，**在此向他们表示衷心感谢！**
+
+- [雨云 (Rainyun)](https://www.rainyun.com/YUKITO_) - 新一代云服务器提供商
+- [Fumadocs](https://github.com/fuma-nama/fumadocs) - 使用 Next.js 构建文档网站的实用框架
+- [LXGW WenKai / 霞鹜文楷](https://github.com/lxgw/LxgwWenKai) - 优雅美观的开源字体
+- [lxgw-wenkai-webfont](https://github.com/chawyehsu/lxgw-wenkai-webfont) - 霞骛文楷的 npm 网页字体包
+- [Squoosh](https://github.com/GoogleChromeLabs/squoosh?tab=readme-ov-file) - 通过多种格式减小图像文件大小的图像压缩 web app
+- [Lucide](https://github.com/lucide-icons/lucide) - 包含 1k+ SVG 文件的开源图标库
+- [Simple Icons](https://github.com/simple-icons/simple-icons) - 包含 3.2k+ 流行品牌 SVG 图标的开源图标库
+
+欢迎提交 Issue 和 Pull Request 来帮助改进项目！如果它对你有所帮助，**请 star 这个 repo**，非常感谢！
+

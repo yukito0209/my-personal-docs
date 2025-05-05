@@ -6,53 +6,24 @@ A modern personal homepage and documentation system built with Next.js and Fumad
 
 ## 🌟 Features
 
-### 🎨 UI & Interaction
-- Responsive design for mobile and desktop
-- **Frosted glass UI effect applied in multiple areas**
-- **Global LXGW WenKai font applied**
-- **Custom light/dark mode toggle button**
-- **Smooth background image transition for light/dark modes**
-- **Photo card hover glow effect**
-
-### 🏠 Homepage
-- Personal information display
-- Education history
-- Interest showcase
-- Portfolio display
-- **Bangumi Daily Calendar** (Replaces announcement board)
-
-### 🎵 Music Player
-- **Custom music player based on React Context**
-- Local music file playback support (MP3, WAV, OGG, FLAC)
-- Album cover display
-- Playback controls (play/pause, previous/next)
-- Volume control and progress bar
-
-### 📚 Documentation System
-- Fumadocs-based document management
-- MDX format support
-- Document search functionality
-- **Content area and Table of Contents with glass effect**
-- **GitHub repository link in navigation bar**
-
-### 🖼️ Gallery
-- Waterfall layout display
-- **Image lightbox viewer (with keyboard navigation)**
-- High-resolution image support and lazy loading
-- Responsive design
-
-### 🦶 Global Footer
-- Displays copyright and relevant links
+- Responsive personal homepage displaying personal information and education history
+- Fumadocs-based documentation system with MDX support and search functionality
+- Custom local music player with album cover display (supports MP3, WAV, OGG, FLAC)
+- Waterfall layout photo gallery
+- Light/dark mode switching with smooth transition animations
+- Global application of LXGW WenKai font for enhanced reading experience
+- Frosted glass UI effect applied in multiple areas for enhanced visual hierarchy
+- Bangumi-API-based "Daily Anime Broadcast" and "My Watching List"
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 15.3.1
-- **UI Components**: Fumadocs UI 15.2.12
-- **Styling**: TailwindCSS 4.1.4
-- **Documentation**: Fumadocs MDX 11.6.1
-- **Icons**: Lucide React 0.503.0, **Simple Icons (Brand SVG icon library)**
-- **Type Checking**: TypeScript 5.8.3
-- **State Management**: **React Context API (for Theme and Music Player)**
+- **Next.js 15.3.1** - React application framework
+- **Fumadocs UI 15.2.12 & MDX 11.6.1** - Documentation system core
+- **TailwindCSS 4.1.4** - Utility-first CSS framework
+- **TypeScript 5.8.3** - Strongly typed JavaScript superset
+- **Lucide React 0.503.0** - Icon library
+- **Simple Icons** - Brand SVG icon library
+- **React Context API** - For state management (e.g., theme, music player)
 
 ## 📦 Project Structure
 
@@ -78,8 +49,8 @@ my-personal-docs/
 
 ### Requirements
 
-- Node.js 18.0 or higher
-- npm or yarn
+- Node.js 20.0 or higher
+- npm
 
 ### Installation
 
@@ -106,9 +77,6 @@ npm run dev
 ```bash
 # Build for production
 npm run build
-
-# Start production server
-npm run start
 ```
 
 ## 🔧 Configuration
@@ -120,37 +88,32 @@ Place music files in the `public/music` directory. Supported formats:
 - WAV
 - OGG
 - FLAC
+It is recommended that music files are not too large to avoid long loading times for web playback.
 
 ### Gallery
 
 Place image files in the `public/photos` directory. It's recommended to compress images appropriately for better loading performance.
+We recommend using [Squoosh](https://squoosh.app/) to compress images into webp format.
 
 ### Documentation
 
 Documentation uses MDX format and should be placed in the `content/docs` directory.
-
-## 📝 Development Notes
-
-1. Image Optimization
-   - Use Next.js Image component for optimization
-   - Consider using CDN for large images
-   - Implement image lazy loading
-
-2. Performance Optimization
-   - Proper component splitting
-   - Use React.memo() for render optimization
-   - Compress images and audio files appropriately
-   - Use Next.js Turbo mode for development
-
-3. Security
-   - Add proper validation to API routes
-   - Avoid exposing sensitive information
-   - Use environment variables for sensitive configurations
+For specific usage, please refer to: https://fumadocs.dev/docs/mdx
 
 ## 📄 License
 
-MIT License
+[MIT License](https://github.com/yukito0209/my-personal-docs/blob/master/LICENSE)
 
-## 🤝 Contributing
+## 🤝 Special Thanks
 
-Issues and Pull Requests are welcome to help improve the project.
+The successful implementation of this project relies on the support of the following projects/service providers. **We express our sincere gratitude to them!**
+
+- [Rainyun](https://www.rainyun.com/YUKITO_) - A new generation cloud server provider
+- [Fumadocs](https://github.com/fuma-nama/fumadocs) - A practical framework for building documentation websites with Next.js
+- [LXGW WenKai](https://github.com/lxgw/LxgwWenKai) - An elegant and beautiful open-source font
+- [lxgw-wenkai-webfont](https://github.com/chawyehsu/lxgw-wenkai-webfont) - npm webfont package for LXGW WenKai
+- [Squoosh](https://github.com/GoogleChromeLabs/squoosh?tab=readme-ov-file) - Image compression web app that reduces image file sizes through various formats
+- [Lucide](https://github.com/lucide-icons/lucide) - An open-source icon library featuring 1k+ SVG files
+- [Simple Icons](https://github.com/simple-icons/simple-icons) - An open-source icon library containing 3.2k+ SVG icons for popular brands
+
+Feel free to submit Issues and Pull Requests to help improve the project! If it helps you, **please star this repo**. Thank you very much!
