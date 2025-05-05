@@ -167,7 +167,7 @@ export default function GalleryPage() {
     setSelectedImageIndex(index);
     setIsModalOpen(true);
   }, []);
-
+    
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedImageIndex(null);
@@ -233,16 +233,16 @@ export default function GalleryPage() {
             </div>
           )}
           {!isLoading && !isLoadingError && photos.length > 0 && (
-            <MasonryGrid>
-              {photos.map((photo, index) => (
+          <MasonryGrid>
+            {photos.map((photo, index) => (
                 <PhotoCard 
                   key={photo.src} 
                   photo={photo} 
                   index={index}
                   openModal={openModal}
                 />
-              ))}
-            </MasonryGrid>
+            ))}
+          </MasonryGrid>
           )}
           {!isLoading && !isLoadingError && photos.length === 0 && (
              <div className="text-center text-muted-foreground py-10">

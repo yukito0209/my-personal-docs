@@ -2,19 +2,21 @@
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 
-/* 导入 LXGW WenKai 字体 */
+/* 导入 LXGW WenKai Lite 字体 */
 @font-face {
   font-family: 'LXGW WenKai';
-  src: url('/fonts/LXGWWenKai-Regular.ttf') format('truetype');
+  src: url('/fonts/LXGWWenKaiLite-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'LXGW WenKai';
-  src: url('/fonts/LXGWWenKai-Medium.ttf') format('truetype');
+  src: url('/fonts/LXGWWenKaiLite-Medium.woff2') format('woff2');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 /* 隐藏 Fumadocs UI 的默认主题切换按钮 */

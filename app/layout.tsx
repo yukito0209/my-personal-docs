@@ -9,8 +9,8 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" /* className={inter.className} */ suppressHydrationWarning>
       <head>
-        <link rel="preload" href="/fonts/LXGWWenKai-Regular.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/LXGWWenKai-Medium.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/LXGWWenKaiLite-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/LXGWWenKaiLite-Medium.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/backgrounds/bg_light.webp" as="image" type="image/webp" />
         <link rel="preload" href="/backgrounds/bg_dark.webp" as="image" type="image/webp" />
       </head>
