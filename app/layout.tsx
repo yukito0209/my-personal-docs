@@ -4,6 +4,16 @@ import type { ReactNode } from 'react';
 import { MusicPlayerProvider } from './contexts/MusicPlayerContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ThemeToggle } from './components/ThemeToggle';
+import type { Metadata } from 'next';
+
+// Add metadata for favicon
+export const metadata: Metadata = {
+  // You might want to add other metadata fields like title, description here later
+  icons: {
+    icon: 'https://avatars.githubusercontent.com/u/76610895?v=4',
+    apple: 'https://avatars.githubusercontent.com/u/76610895?v=4', // for Apple touch icon
+  },
+};
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
