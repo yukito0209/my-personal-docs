@@ -1,23 +1,9 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
-
-/* 导入 LXGW WenKai Lite 字体 */
-@font-face {
-  font-family: 'LXGW WenKai';
-  src: url('/fonts/LXGWWenKaiLite-Regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'LXGW WenKai';
-  src: url('/fonts/LXGWWenKaiLite-Medium.woff2') format('woff2');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
+/* @import 'lxgw-wenkai-webfont/style.css'; */ /* Commented out the main style import */
+@import 'lxgw-wenkai-webfont/lxgwwenkai-regular.css'; /* Import specific regular weight */
+@import 'lxgw-wenkai-webfont/lxgwwenkai-bold.css';    /* Import specific bold weight */
 
 /* 隐藏 Fumadocs UI 的默认主题切换按钮 */
 [data-theme-toggle] {
@@ -28,7 +14,7 @@
     :root,
     :host {
         --color-fd-primary: #1f66f4 !important;
-        --font-sans: 'LXGW WenKai' !important;
+        --font-sans: 'LXGW WenKai' !important; /* Update font family name to Regular */
     }
 }
 
@@ -90,9 +76,9 @@
   /* 设置 body 字体和背景过渡 */
   body {
     @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
-    font-family: var(--font-sans);
+    font-family: var(--font-sans); /* Ensure this uses the updated --font-sans */
     /* 合并颜色和背景的过渡 */
-    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out; 
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
     background-image: url('/backgrounds/bg_light.png');
     background-size: cover;
     background-position: center;
@@ -103,7 +89,7 @@
   
   /* 设置标题字体 */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-sans);
+    font-family: var(--font-sans); /* Ensure this uses the updated --font-sans */
     /* 可以为标题添加颜色过渡，如果需要的话 */
     /* transition: color 0.3s ease-in-out; */
   }
@@ -111,7 +97,7 @@
   /* 设置普通文本元素的字体 */
   p, span, a, div,
   button, input, textarea {
-    font-family: var(--font-sans);
+    font-family: var(--font-sans); /* Ensure this uses the updated --font-sans */
     /* 移除这里的全局过渡，避免文本闪烁 */
   }
   
@@ -122,7 +108,7 @@
   } */ /* 注释掉过于宽泛的规则 */
   .fd-nav-title,
   .fd-nav-title > span { /* 更精确地指向标题 span */
-    font-family: var(--font-sans) !important;
+    font-family: var(--font-sans) !important; /* Ensure this uses the updated --font-sans */
     transition-property: none !important; /* 覆盖 transition-property，阻止颜色过渡 */
   }
   
