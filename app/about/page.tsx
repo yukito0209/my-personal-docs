@@ -116,7 +116,7 @@ export default function AboutPage() {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Link
-                    href="https://afdian.net/@yukito0209"
+                    href="https://afdian.com/a/yukiweb?tab=home"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50 glass-effect"
