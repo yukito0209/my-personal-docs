@@ -91,7 +91,7 @@ export async function GET() {
   try {
     const musicDir = path.join(process.cwd(), 'public', 'music');
     const files = fs.readdirSync(musicDir)
-      .filter(file => file.endsWith('.mp3') || file.endsWith('.flac'));
+      .filter(file => file.endsWith('.mp3') || file.endsWith('.flac') || file.endsWith('.m4a'));
     
     const musicFiles = await Promise.all(files.map(async file => {
       const filePath = path.join(musicDir, file);
