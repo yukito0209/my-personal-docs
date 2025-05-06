@@ -334,59 +334,6 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [isPlaying, hasUserInteracted]);
 
-  // EFFECT FOR PRELOADING NEXT SONG (using a temporary audio element)
-  const nextSongPreloaderRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    // 1. Cleanup previous preload audio element if it exists
-    if (nextSongPreloaderRef.current) {
-      nextSongPreloaderRef.current.pause();
-      nextSongPreloaderRef.current.src = ''; // Release resources
-      nextSongPreloaderRef.current = null;
-      console.log('[Context Preload NextAudioEl] Cleaned up previous temporary audio element for next song.');
-    }
-
-    if (!playlist || playlist.length <= 1) {
-      console.log('[Context Preload NextAudioEl] Playlist empty or too short; skipping preloading next song.');
-      return;
-    }
-
-    const nextSongIndex = (currentSongIndex + 1) % playlist.length;
-    const nextSong = playlist[nextSongIndex];
-
-    if (!nextSong || !nextSong.src || nextSongIndex === currentSongIndex) { // also check if next is same as current (playlist of 1)
-      console.log('[Context Preload NextAudioEl] Next song is invalid or same as current; skipping preloading.');
-      return;
-    }
-
-    console.log(`[Context Preload NextAudioEl] Starting to preload next song: ${nextSong.title} via Audio() object.`);
-
-    try {
-      const audioPreloader = new Audio();
-      audioPreloader.src = nextSong.src;
-      audioPreloader.preload = 'auto';
-      audioPreloader.muted = true;
-      audioPreloader.load();
-
-      nextSongPreloaderRef.current = audioPreloader; // Store the new preloader
-
-      console.log(`[Context Preload NextAudioEl] Initiated loading for next song: ${nextSong.title}`);
-    } catch (error) {
-      console.error(`[Context Preload NextAudioEl] Error creating Audio preloader for next song ${nextSong.title}:`, error);
-    }
-
-    // Cleanup function for when the effect re-runs or component unmounts
-    return () => {
-      if (nextSongPreloaderRef.current) {
-        console.log(`[Context Preload NextAudioEl] Effect cleanup: Pausing and releasing src for ${nextSongPreloaderRef.current.src.split('/').pop()}.`);
-        nextSongPreloaderRef.current.pause();
-        nextSongPreloaderRef.current.src = '';
-        nextSongPreloaderRef.current = null;
-      }
-    };
-  // Ensure dependencies correctly trigger re-evaluation for next song
-  }, [currentSongIndex, playlist]); // currentTrack is not strictly needed here as nextSong is derived from index and playlist
-
   // --- Control Functions ---
 
   const togglePlay = useCallback(() => {
