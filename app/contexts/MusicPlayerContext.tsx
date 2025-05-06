@@ -334,19 +334,25 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [isPlaying, hasUserInteracted]);
 
-  // EFFECT FOR PRELOADING ALL OTHER SONGS (replaces 'preload next song' logic)
+  // EFFECT FOR PRELOADING ALL OTHER SONGS (using temporary audio elements)
+  const preloadAudioElementsRef = useRef<HTMLAudioElement[]>([]);
+
   useEffect(() => {
-    // 1. Cleanup any existing preload links added by this effect
-    // Use a specific class to identify links managed by this effect
-    document.querySelectorAll('link.dynamic-song-preload-link').forEach(link => link.remove());
-    console.log('[Context Preload] Cleaned up previous dynamic song preload links.');
+    // 1. Cleanup previous preload audio elements
+    preloadAudioElementsRef.current.forEach(audioEl => {
+      audioEl.pause();
+      audioEl.src = ''; // Release resources
+      // Optionally remove event listeners if any were added, though not in this basic version
+    });
+    preloadAudioElementsRef.current = []; // Clear the array
+    console.log('[Context Preload AudioEl] Cleaned up previous temporary audio elements.');
 
     if (!playlist || playlist.length <= 1 || !currentTrack) {
-      console.log('[Context Preload] Playlist empty, too short, or no current track; skipping preloading all other songs.');
+      console.log('[Context Preload AudioEl] Playlist empty, too short, or no current track; skipping preloading.');
       return;
     }
 
-    console.log(`[Context Preload] Starting to preload other songs. Current: ${currentTrack.title}`);
+    console.log(`[Context Preload AudioEl] Starting to preload other songs via Audio() objects. Current: ${currentTrack.title}`);
     let preloadedCount = 0;
 
     playlist.forEach((song, index) => {
@@ -356,32 +362,38 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
       }
 
       try {
-        const preloadLink = document.createElement('link');
-        preloadLink.rel = 'preload';
-        preloadLink.href = song.src; // Browser resolves relative URLs against document.baseURI
-        preloadLink.as = 'audio';
-        preloadLink.classList.add('dynamic-song-preload-link'); // Add class for easy removal
-        // preloadLink.crossOrigin = "anonymous"; // Uncomment if audio is on a different domain and CORS is needed
+        const audioPreloader = new Audio();
+        audioPreloader.src = song.src;
+        audioPreloader.preload = 'auto'; // Hint to load the entire file
+        audioPreloader.muted = true;      // Ensure no sound
+        // We don't need to append this to the DOM for it to load
+        audioPreloader.load(); // Start loading the audio data
 
-        document.head.appendChild(preloadLink);
+        preloadAudioElementsRef.current.push(audioPreloader);
         preloadedCount++;
       } catch (error) {
-        console.error(`[Context Preload] Error creating preload link for ${song.title}:`, error);
+        console.error(`[Context Preload AudioEl] Error creating Audio preloader for ${song.title}:`, error);
       }
     });
 
     if (preloadedCount > 0) {
-      console.log(`[Context Preload] Added ${preloadedCount} preload links for other songs in the playlist.`);
+      console.log(`[Context Preload AudioEl] Initiated loading for ${preloadedCount} other songs using Audio() objects.`);
     } else {
-      console.log('[Context Preload] No other songs were eligible for preloading.');
+      console.log('[Context Preload AudioEl] No other songs were eligible for preloading via Audio() objects.');
     }
 
+    // The cleanup for the audio elements in the ref is handled at the start of the effect
+    // and on component unmount by the nature of the ref and effect cleanup returning nothing specific for this array.
+    // However, for a full unmount scenario, an explicit cleanup in the return function is good practice.
     return () => {
-      // Cleanup all preload links added by this effect when dependencies change or component unmounts
-      document.querySelectorAll('link.dynamic-song-preload-link').forEach(link => link.remove());
-      console.log('[Context Preload] Effect cleanup: Removed all dynamic song preload links.');
+      console.log('[Context Preload AudioEl] Effect cleanup on unmount/dependency change.');
+      preloadAudioElementsRef.current.forEach(audioEl => {
+        audioEl.pause();
+        audioEl.src = '';
+      });
+      preloadAudioElementsRef.current = [];
     };
-  }, [currentSongIndex, playlist, currentTrack]); // currentTrack helps ensure logic re-runs if track becomes undefined
+  }, [currentSongIndex, playlist, currentTrack]);
 
   // --- Control Functions ---
 
