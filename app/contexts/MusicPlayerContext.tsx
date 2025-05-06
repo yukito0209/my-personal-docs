@@ -334,6 +334,54 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [isPlaying, hasUserInteracted]);
 
+  // EFFECT FOR PRELOADING ALL OTHER SONGS (replaces 'preload next song' logic)
+  useEffect(() => {
+    // 1. Cleanup any existing preload links added by this effect
+    // Use a specific class to identify links managed by this effect
+    document.querySelectorAll('link.dynamic-song-preload-link').forEach(link => link.remove());
+    console.log('[Context Preload] Cleaned up previous dynamic song preload links.');
+
+    if (!playlist || playlist.length <= 1 || !currentTrack) {
+      console.log('[Context Preload] Playlist empty, too short, or no current track; skipping preloading all other songs.');
+      return;
+    }
+
+    console.log(`[Context Preload] Starting to preload other songs. Current: ${currentTrack.title}`);
+    let preloadedCount = 0;
+
+    playlist.forEach((song, index) => {
+      // Don't preload the currently playing/loading song, or if song/src is invalid
+      if (index === currentSongIndex || !song || !song.src) {
+        return;
+      }
+
+      try {
+        const preloadLink = document.createElement('link');
+        preloadLink.rel = 'preload';
+        preloadLink.href = song.src; // Browser resolves relative URLs against document.baseURI
+        preloadLink.as = 'audio';
+        preloadLink.classList.add('dynamic-song-preload-link'); // Add class for easy removal
+        // preloadLink.crossOrigin = "anonymous"; // Uncomment if audio is on a different domain and CORS is needed
+
+        document.head.appendChild(preloadLink);
+        preloadedCount++;
+      } catch (error) {
+        console.error(`[Context Preload] Error creating preload link for ${song.title}:`, error);
+      }
+    });
+
+    if (preloadedCount > 0) {
+      console.log(`[Context Preload] Added ${preloadedCount} preload links for other songs in the playlist.`);
+    } else {
+      console.log('[Context Preload] No other songs were eligible for preloading.');
+    }
+
+    return () => {
+      // Cleanup all preload links added by this effect when dependencies change or component unmounts
+      document.querySelectorAll('link.dynamic-song-preload-link').forEach(link => link.remove());
+      console.log('[Context Preload] Effect cleanup: Removed all dynamic song preload links.');
+    };
+  }, [currentSongIndex, playlist, currentTrack]); // currentTrack helps ensure logic re-runs if track becomes undefined
 
   // --- Control Functions ---
 
