@@ -87,17 +87,6 @@
     /* 移除这里的全局过渡，避免文本闪烁 */
   }
   
-  /* 确保导航栏字体，并禁用标题过渡 */
-  /* .fd-nav, 
-  .fd-nav * { 
-    transition: none !important; 
-  } */ /* 注释掉过于宽泛的规则 */
-  .fd-nav-title,
-  .fd-nav-title > span { /* 更精确地指向标题 span */
-    font-family: var(--font-sans) !important; /* Ensure this uses the updated --font-sans */
-    transition-property: none !important; /* 覆盖 transition-property，阻止颜色过渡 */
-  }
-  
   /* 深色模式背景图片过渡 */
   body::before {
     content: '';
@@ -129,11 +118,6 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   }
-  
-  /* 确保图片和图标在主题切换时不会闪烁 (这个保留) */
-  img, svg {
-    transition: none;
-  }
 } 
 
 /* 相册卡片倾斜效果优化 */
@@ -155,34 +139,6 @@
 .tilt-card:hover {
   /* 使用白色创建光晕效果 */
   box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.7);
-}
-
-/* 尝试为 DocsLayout 中的 TOC 添加毛玻璃效果 */
-.fd-layout > aside[aria-label="Table of Contents"] {
-  @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 rounded-lg p-4;
-  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* 添加过渡 */
-  /* 可能需要根据实际效果调整 padding 或其他样式 */
-}
-
-/* 如果 TOC 在一个 div 里 */
-.fd-layout > div[role="complementary"] {
-   @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 rounded-lg p-4;
-   transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* 添加过渡 */
-   /* 可能需要根据实际效果调整 padding 或其他样式 */
-}
-
-/* 增加特异性，如果上述规则无效 */
-.fd-docs > main > aside[aria-label="Table of Contents"],
-.fd-docs > main > div[role="complementary"] {
-   @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 rounded-lg p-4;
-   transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* 添加过渡 */
-   /* 可能需要根据实际效果调整 padding 或其他样式 */
-}
-
-/* 直接应用给 Clerk 样式的 TOC (因为 page.tsx 中指定了 style: 'clerk') */
-.fd-toc--clerk {
-    @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 rounded-lg p-4;
-    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* 添加过渡 */
 }
 
 /* --- 修复特定元素主题切换闪烁 --- */
