@@ -11,6 +11,7 @@ import { siGithub } from 'simple-icons/icons';
  * Docs Layout: app/docs/layout.tsx
  */
 export const baseOptions: BaseLayoutProps = {
+  githubUrl: 'https://github.com/yukito0209/my-personal-docs',
   nav: {
     title: (
       <span className='flex items-center'>
@@ -58,20 +59,5 @@ export const baseOptions: BaseLayoutProps = {
       ),
       url: '/about',
     },
-    {
-      type: 'icon',
-      icon: (
-        <svg 
-          role="img" 
-          viewBox="0 0 24 24" 
-          fill="currentColor" 
-          dangerouslySetInnerHTML={{ __html: siGithub.svg }} 
-          className="h-5 w-5"
-        />
-      ),
-      url: 'https://github.com/yukito0209/my-personal-docs',
-      label: 'GitHub Repository',
-      text: ''
-    }
   ],
 };

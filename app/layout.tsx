@@ -5,6 +5,7 @@ import { MusicPlayerProvider } from './contexts/MusicPlayerContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import type { Metadata } from 'next';
+import { Banner } from 'fumadocs-ui/components/banner';
 
 // Add metadata for favicon
 export const metadata: Metadata = {
@@ -29,6 +30,9 @@ export default function Layout({ children }: { children: ReactNode }) {
               <div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
                 <ThemeToggle />
               </div>
+              {/* 网站横幅开始 */}
+              {/* <Banner variant="rainbow" id="1">个人网站绝赞施工中(๑•̀ㅂ•́)و✧</Banner>  */}
+              {/* 网站横幅结束 */}
               {children}
             </MusicPlayerProvider>
           </ThemeProvider>

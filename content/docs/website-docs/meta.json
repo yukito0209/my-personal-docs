@@ -2,5 +2,13 @@
     "title": "网站文档",
     "description": "有关本网站部署、开发、维护的文档集合",
     "root": true,
-    "icon": "Cog"
+    "full": true,
+    "icon": "Cog",
+    "pages": [
+        "---README 文件---",
+        "README",
+        "README_EN",
+        "---部署指南---",
+        "DEPLOY"
+    ]
 }
