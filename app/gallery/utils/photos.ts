@@ -3,6 +3,7 @@ import path from 'path';
 
 export interface Photo {
   src: string;
+  thumbnailSrc: string;
   alt: string;
 }
 
@@ -14,6 +15,7 @@ export async function getPhotos(): Promise<Photo[]> {
     
     return files.map(file => ({
       src: `/photos/${file}`,
+      thumbnailSrc: `/photos/thumbnails/${file}`,
       alt: file.split('.')[0]
     }));
   } catch (error) {

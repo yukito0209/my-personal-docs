@@ -22,6 +22,7 @@ export async function GET() {
     // 映射为客户端需要的格式
     const photos = files.map(file => ({
       src: `/photos/${file}`, // Web 访问路径
+      thumbnailSrc: `/photos/thumbnails/${file}`, // 缩略图 Web 访问路径
       alt: file.split('.').slice(0, -1).join('.') // 文件名作为 alt (移除扩展名)
     }));
 

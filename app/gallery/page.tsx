@@ -125,6 +125,7 @@ function MasonryGrid({ children }: { children: React.ReactNode }) {
 
 interface Photo {
   src: string;
+  thumbnailSrc: string;
   alt: string;
 }
 

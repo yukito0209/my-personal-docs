@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 
 interface Photo {
   src: string;
+  thumbnailSrc: string;
   alt: string;
 }
 
@@ -52,7 +53,7 @@ export function PhotoCard({ photo, index, openModal }: PhotoCardProps) {
   useEffect(() => {
     setIsLoading(true);
     const img = new window.Image();
-    img.src = photo.src;
+    img.src = photo.thumbnailSrc;
     img.onload = () => {
       if (img.naturalWidth && img.naturalHeight) {
         setAspectRatio(`${img.naturalWidth} / ${img.naturalHeight}`);
@@ -60,11 +61,11 @@ export function PhotoCard({ photo, index, openModal }: PhotoCardProps) {
       setIsLoading(false);
     };
     img.onerror = () => {
-      console.error(`Failed to load image: ${photo.src}`);
+      console.error(`Failed to load image: ${photo.thumbnailSrc}`);
       setIsLoading(false);
       setAspectRatio('1');
     }
-  }, [photo.src]);
+  }, [photo.thumbnailSrc]);
 
   return (
     <div className="mb-4 break-inside-avoid">
@@ -86,7 +87,7 @@ export function PhotoCard({ photo, index, openModal }: PhotoCardProps) {
           )}
           <Image
             ref={imageRef}
-            src={photo.src}
+            src={photo.thumbnailSrc}
             alt={photo.alt}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
