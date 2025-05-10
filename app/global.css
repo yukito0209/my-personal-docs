@@ -153,3 +153,8 @@
 .announcement-card * {
     transition: none !important;
 }
+
+/* Main content wrapper transition for background view toggle */
+#main-content-wrapper {
+  transition: opacity 0.5s ease-in-out;
+}
