@@ -238,7 +238,7 @@ export function CustomMusicPlayer() {
                 <p className="text-sm text-center mt-1">{getErrorMessage(error)}</p>
                  <button 
                     onClick={resetError}
-                  className="mt-4 flex items-center gap-1 px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-sm"
+                  className="mt-4 flex items-center gap-1 px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-sm transition-all active:scale-95 duration-100"
                 >
                   <RefreshCw className="h-3 w-3" /> 
                   重试
@@ -283,7 +283,7 @@ export function CustomMusicPlayer() {
                   onClick={handleTogglePlay}
                 >
                   <button
-                    className="transform scale-0 group-hover:scale-100 transition-transform duration-200 p-4 rounded-full bg-white/90 text-black hover:bg-white"
+                    className="transform scale-0 group-hover:scale-100 transition-transform duration-200 p-4 rounded-full bg-white/90 text-black hover:bg-white active:scale-90"
                     aria-label={isPlaying ? "暂停" : "播放"}
                   >
                     {isPlaying ? (
@@ -316,7 +316,7 @@ export function CustomMusicPlayer() {
               <li 
                 key={song.src + index}
                 onClick={() => playSongAtIndex(index)}
-                className={`flex items-center space-x-3 p-2 rounded-md cursor-pointer transition-colors ${ 
+                className={`flex items-center space-x-3 p-2 rounded-md cursor-pointer transition-all duration-100 active:scale-[0.98] ${ 
                   index === currentSongIndex ? 'bg-primary/10 text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
