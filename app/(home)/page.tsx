@@ -24,9 +24,9 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row gap-6 py-8">
+        <div className="flex flex-col md:grid md:grid-cols-[minmax(0,300px)_1fr_minmax(0,300px)] gap-6 py-8">
           {/* 左侧音乐播放器 */}
-          <div className="w-full md:w-[300px] md:sticky md:top-4 md:self-start">
+          <div className="w-full md:sticky md:top-4 md:self-start">
             <div className="rounded-lg border bg-card shadow-sm glass-effect h-[600px]">
               <div className="p-4 h-full">
                 <CustomMusicPlayer />
@@ -35,7 +35,7 @@ export default async function HomePage() {
           </div>
 
           {/* 中间主要内容 */}
-          <div className="flex-1 flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <div className="w-full max-w-2xl rounded-lg border bg-card p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg glass-effect">
               <div className="flex flex-col items-center space-y-4">
                 <Image
@@ -161,7 +161,7 @@ export default async function HomePage() {
           </div>
 
           {/* 右侧 Bangumi Widget */}
-          <div className="w-full md:w-[300px] md:sticky md:top-4 md:self-start">
+          <div className="w-full md:sticky md:top-4 md:self-start">
             <DynamicBangumiWidget />
           </div>
         </div>
