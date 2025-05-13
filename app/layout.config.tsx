@@ -34,8 +34,8 @@ export const baseOptions: BaseLayoutProps = {
     {
       text: (
         <>
-          <BookText className="mr-1.2 h-4 w-4" />
-          文档
+          <BookText className="mr-1.2 h-4 w-4 nav-link-icon" />
+          <span className="nav-link-text">文档</span>
         </>
       ),
       url: '/docs',
@@ -44,8 +44,8 @@ export const baseOptions: BaseLayoutProps = {
     {
       text: (
         <>
-          <ImageIcon className="mr-1.2 h-4 w-4" />
-          相册
+          <ImageIcon className="mr-1.2 h-4 w-4 nav-link-icon" />
+          <span className="nav-link-text">相册</span>
         </>
       ),
       url: '/gallery',
@@ -53,8 +53,8 @@ export const baseOptions: BaseLayoutProps = {
     {
       text: (
         <>
-          <Info className="mr-1.2 h-4 w-4" />
-          关于
+          <Info className="mr-1.2 h-4 w-4 nav-link-icon" />
+          <span className="nav-link-text">关于</span>
         </>
       ),
       url: '/about',
