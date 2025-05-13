@@ -153,3 +153,27 @@
 #main-content-wrapper {
   transition: opacity 0.5s ease-in-out;
 }
+
+
+/* --- 顶部导航栏图标悬停效果 --- */
+.nav-link-icon {
+  transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Fumadocs UI 通常会将链接渲染为 <a> 标签 */
+/* 当鼠标悬停在包含图标的链接上时，应用以下样式到图标 */
+a:hover .nav-link-icon {
+  transform: scale(1.1); /* 图标放大1.1倍 */
+  color: hsl(var(--primary)); /* 图标颜色变为主题主色 */
+}
+
+/* --- 顶部导航栏文本悬停效果 --- */
+.nav-link-text {
+  display: inline-block; /* 确保 transform scale 生效 */
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out; /* 添加 transform 过渡 */
+}
+
+a:hover .nav-link-text {
+  color: hsl(var(--primary)); /* 文本颜色变为主题主色 */
+  transform: scale(1.1); /* 文本放大1.1倍 */
+}
