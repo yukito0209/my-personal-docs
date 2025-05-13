@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
-/* @import 'lxgw-wenkai-webfont/style.css'; */ /* Commented out the main style import */
 @import 'lxgw-wenkai-webfont/lxgwwenkai-regular.css'; /* Import specific regular weight */
 @import 'lxgw-wenkai-webfont/lxgwwenkai-bold.css';    /* Import specific bold weight */
 
@@ -14,7 +13,8 @@
     :root,
     :host {
         --color-fd-primary: #1f66f4 !important;
-        --font-sans: 'LXGW WenKai' !important; /* Update font family name to Regular */
+        /* Update font family name to Regular */
+        --font-sans: 'LXGW WenKai' !important;
     }
 }
 
@@ -147,11 +147,6 @@
     transition-property: background-color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 300ms;
-}
-
-/* 禁用公告栏卡片内 *所有后代元素* 的过渡 */
-.announcement-card * {
-    transition: none !important;
 }
 
 /* Main content wrapper transition for background view toggle */
