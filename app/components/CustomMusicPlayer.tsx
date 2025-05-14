@@ -229,71 +229,117 @@ export function CustomMusicPlayer() {
             isPlaylistViewOpen ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
           }`}
         >
-          <div className="space-y-4 flex-shrink-0 p-4 pt-0">
-          <div className="relative pt-[100%] rounded-lg overflow-hidden bg-black/5 group">
+          <div className="space-y-4 flex-shrink-0 p-4 pt-0 mt-10">
+          <div 
+            className="relative w-full aspect-square max-w-[250px] mx-auto cursor-pointer group vinyl-player-wrapper"
+            onClick={handleTogglePlay}
+          >
+            {/* Record Disc Image and Album Cover Container (This whole div spins) */}
+            <div 
+              className={`record-disc-spinning absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-[5]`}
+              style={{ animationPlayState: (isPlaying && !isLoading && !error) ? 'running' : 'paused' }}
+            >
+              {/* Disc Image - acts as background */}
+              <Image 
+                src="/images/disc.png" 
+                alt="Record Disc"
+                fill
+                sizes="(max-width: 250px) 100vw, 250px"
+                className="object-contain" 
+                priority
+              />
+              
+              {/* Album Cover - absolutely positioned on top of the disc.png, inside the spinning container */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                {currentTrack?.coverUrl && (
+                  <>
+                    {!coverLoaded && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full z-10"> {/* Spinner for cover */}
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                      </div>
+                    )}
+                    <Image
+                      key={currentTrack.src} // Ensures re-render on track change
+                      src={currentTrack.coverUrl}
+                      alt={`${currentTrack.title} 封面`}
+                      width={120} // Desired display width
+                      height={120} // Desired display height
+                      className={`object-cover rounded-full shadow-md transition-opacity duration-300 ${coverLoaded ? 'opacity-100' : 'opacity-0'}`}
+                      style={{ width: '65%', height: '65%' }} // Adjusted size for disc.png
+                      priority
+                      unoptimized
+                      onLoad={() => setCoverLoaded(true)}
+                      onError={() => {
+                        setCoverLoaded(true); // Hide spinner even on error
+                      }}
+                    />
+                  </>
+                )}
+                {!currentTrack?.coverUrl && !isLoading && (
+                    <div className="w-[55%] h-[55%] bg-gray-700 rounded-full flex items-center justify-center">
+                        <Music2 className="w-1/2 h-1/2 text-gray-500" />
+                    </div>
+                )}
+              </div>
+            </div>
+
+            {/* Record Arm Image (remains outside the spinning div) */}
+            <div 
+              className={`absolute top-[-20%] right-[14%] w-[45%] h-[55%] z-[20] transition-transform duration-500 ease-in-out ${
+                isPlaying && !isLoading && !error ? 'rotate-[-4.5deg]' : '-rotate-[35deg]'
+              }`}
+              style={{ transformOrigin: '20px 0px' }} // Adjust origin if needle.png pivot is different
+            >
+              <Image 
+                src="/images/needle.png" 
+                alt="Record Arm"
+                fill
+                sizes="(max-width: 150px) 100vw, 150px" // Approx size of arm container
+                className="object-contain"
+                priority
+              />
+            </div>
+
+            {/* Loading State Overlay */}
+            {isLoading && !error && (
+              <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/30 rounded-full">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent" />
+              </div>
+            )}
+
+            {/* Error State Overlay */}
             {error && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/70 text-white p-4">
-                <AlertCircle className="h-10 w-10 text-red-500 mb-2" />
-                <p className="font-medium text-center">播放错误</p>
-                <p className="text-sm text-center mt-1">{getErrorMessage(error)}</p>
-                 <button 
-                    onClick={resetError}
-                  className="mt-4 flex items-center gap-1 px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-sm transition-all active:scale-95 duration-100"
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/70 text-white p-4 rounded-full text-center">
+                <AlertCircle className="h-8 w-8 text-red-500 mb-1" />
+                <p className="text-xs font-medium">播放错误</p>
+                <p className="text-[10px] leading-tight mt-0.5">{getErrorMessage(error)}</p>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); resetError(); playSongAtIndex(currentSongIndex); /* Try to replay current */}}
+                  className="mt-2 flex items-center gap-1 px-2 py-0.5 bg-white/20 hover:bg-white/30 rounded text-xs transition-all active:scale-95 duration-100"
                 >
-                  <RefreshCw className="h-3 w-3" /> 
+                  <RefreshCw className="h-2.5 w-2.5" /> 
                   重试
                 </button>
               </div>
             )}
-            {isLoading && !error && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent" />
-              </div>
-            )}
-             {currentTrack?.coverUrl ? (
-              <>
-                {!coverLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                  </div>
-                )}
-                <Image
-                  key={currentTrack.src} 
-                  src={currentTrack.coverUrl}
-                  alt={`${currentTrack.title} 封面`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className={`object-cover ${coverLoaded ? 'opacity-100' : 'opacity-0'} 
-                             transition-all duration-300 ease-in-out 
-                             group-hover:scale-105 group-hover:brightness-110`}
-                  priority
-                  unoptimized
-                  onError={() => setCoverLoaded(true)} 
-                  onLoad={() => setCoverLoaded(true)}
-                />
-              </>
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/5">
-                <Disc className="w-1/3 h-1/3 text-muted-foreground animate-[spin_3s_linear_infinite]" />
-              </div>
-            )}
-              {!isLoading && !error && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors cursor-pointer group-hover:opacity-100 opacity-0"
-                  onClick={handleTogglePlay}
+            
+            {/* Play/Pause button on hover (optional, as disc is clickable) */}
+            {!isLoading && !error && (
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors opacity-0 group-hover:opacity-100 rounded-full"
+              >
+                <button
+                  className="transform scale-0 group-hover:scale-100 transition-transform duration-200 p-3 rounded-full bg-white/80 text-black hover:bg-white active:scale-90"
+                  aria-label={isPlaying ? "暂停" : "播放"}
                 >
-                  <button
-                    className="transform scale-0 group-hover:scale-100 transition-transform duration-200 p-4 rounded-full bg-white/90 text-black hover:bg-white active:scale-90"
-                    aria-label={isPlaying ? "暂停" : "播放"}
-                  >
-                    {isPlaying ? (
-                      <Pause className="h-8 w-8" />
-                    ) : (
-                      <Play className="h-8 w-8" />
-                    )}
-                  </button>
-                </div>
-              )}
+                  {isPlaying ? (
+                    <Pause className="h-6 w-6" />
+                  ) : (
+                    <Play className="h-6 w-6" />
+                  )}
+                </button>
+              </div>
+            )}
           </div>
           <SongInfoDisplay
             title={currentTrack?.title}
