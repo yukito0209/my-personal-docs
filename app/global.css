@@ -273,3 +273,13 @@ a:hover .nav-link-text {
   pointer-events: none; /* 确保不影响鼠标交互 */
   z-index: 6; /* 与另一个反光同级, 高于唱片 (z-5) */
 }
+
+/* --- 歌曲信息切换动画 --- */
+@keyframes songInfoFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.song-info-enter {
+  animation: songInfoFadeIn 0.5s ease-in-out forwards;
+}

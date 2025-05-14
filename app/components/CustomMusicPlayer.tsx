@@ -37,7 +37,7 @@ function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetError
 const SongInfoDisplay = React.memo(({ title, artist, album }: { title?: string, artist?: string, album?: string }) => {
   console.log("Rendering SongInfoDisplay"); // 添加日志检查渲染
   return (
-    <div className="text-center space-y-1">
+    <div className="text-center space-y-1 song-info-enter">
       <h3 className="font-medium text-lg line-clamp-1">{title || '未知歌曲'}</h3>
       <p className="text-sm text-muted-foreground line-clamp-1">
         {artist || '未知艺术家'}
@@ -255,7 +255,7 @@ export function CustomMusicPlayer() {
                   <>
                     {!coverLoaded && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full z-10"> {/* Spinner for cover */}
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                        <Music2 className="h-10 w-10 animate-spin text-white/80" />
                       </div>
                     )}
                     <Image
@@ -326,10 +326,10 @@ export function CustomMusicPlayer() {
             {/* Play/Pause button on hover (optional, as disc is clickable) */}
             {!isLoading && !error && (
               <div
-                className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors opacity-0 group-hover:opacity-100 rounded-full"
+                className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors duration-200 opacity-0 group-hover:opacity-100 rounded-full"
               >
                 <button
-                  className="transform scale-0 group-hover:scale-100 transition-transform duration-200 p-3 rounded-full bg-white/80 text-black hover:bg-white active:scale-90"
+                  className="transform scale-0 group-hover:scale-100 transition-all duration-200 ease-in-out p-3 rounded-full bg-white/80 text-black hover:bg-white active:scale-90"
                   aria-label={isPlaying ? "暂停" : "播放"}
                 >
                   {isPlaying ? (
@@ -342,6 +342,7 @@ export function CustomMusicPlayer() {
             )}
           </div>
           <SongInfoDisplay
+            key={currentTrack?.src}
             title={currentTrack?.title}
             artist={currentTrack?.artist}
             album={currentTrack?.album}
@@ -395,7 +396,10 @@ export function CustomMusicPlayer() {
                  width: `${progressWidth}%` 
                }} 
               />
-             <div className="absolute w-3 h-3 bg-white dark:bg-gray-900 rounded-full shadow-md top-1/2 -translate-y-1/2 -translate-x-1/2 border-2 border-primary transition-transform duration-150 group-hover:scale-110" style={{ left: `${progressWidth}%` }} />
+             <div 
+               className="absolute w-3 h-3 rounded-full shadow-md top-1/2 -translate-y-1/2 -translate-x-1/2 border-2 border-white group-hover:scale-110 transition-transform duration-150" 
+               style={{ backgroundColor: 'hsl(var(--primary))', left: `${progressWidth}%` }} 
+             />
                <div className="absolute inset-y-[-8px] inset-x-[-4px]" /> 
             </div>
            <div className="flex justify-between text-xs text-muted-foreground">
@@ -404,20 +408,20 @@ export function CustomMusicPlayer() {
             </div>
           </div>
           <div className="flex items-center justify-center space-x-6">
-           <button onClick={handlePlayPrevious} className="p-2 hover:text-primary disabled:opacity-50" aria-label="上一首" disabled={isLoading || playlist.length <= 1}><SkipBack className="h-6 w-6" /></button>
-           <button onClick={handleTogglePlay} className={`p-3 rounded-full ${isLoading ? 'bg-gray-200 dark:bg-gray-700 text-muted-foreground cursor-wait' : 'bg-primary/10 hover:bg-primary/20 text-primary'} transition-[background-color] duration-150`} aria-label={isPlaying ? "暂停" : "播放"} disabled={isLoading && !error}>
-             {isLoading && !error ? <div className="h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" /> : isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+           <button onClick={handlePlayPrevious} className="p-2 text-muted-foreground hover:text-primary disabled:opacity-50 transition-all duration-200 ease-in-out hover:scale-110 active:scale-95 disabled:hover:scale-100" aria-label="上一首" disabled={isLoading || playlist.length <= 1}><SkipBack className="h-6 w-6" /></button>
+           <button onClick={handleTogglePlay} className={`p-3 rounded-full ${isLoading && !error ? 'bg-gray-200 dark:bg-gray-700 text-muted-foreground cursor-wait' : 'bg-primary/10 hover:bg-primary/20 text-primary'} transition-all duration-200 ease-in-out hover:scale-110 active:scale-95`} aria-label={isPlaying ? "暂停" : "播放"} disabled={isLoading && !error}>
+             {isLoading && !error ? <Music2 className="h-6 w-6 animate-spin text-current" /> : isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
             </button>
-           <button onClick={handlePlayNext} className="p-2 hover:text-primary disabled:opacity-50" aria-label="下一首" disabled={isLoading || playlist.length <= 1}><SkipForward className="h-6 w-6" /></button>
+           <button onClick={handlePlayNext} className="p-2 text-muted-foreground hover:text-primary disabled:opacity-50 transition-all duration-200 ease-in-out hover:scale-110 active:scale-95 disabled:hover:scale-100" aria-label="下一首" disabled={isLoading || playlist.length <= 1}><SkipForward className="h-6 w-6" /></button>
         </div>
         <div className="flex items-center space-x-3">
-          <button onClick={handleToggleMute} className="p-1.5 hover:text-primary" aria-label={isMuted ? "取消静音" : "静音"}>
+          <button onClick={handleToggleMute} className="p-1.5 text-muted-foreground hover:text-primary transition-all duration-200 ease-in-out hover:scale-110 active:scale-95" aria-label={isMuted ? "取消静音" : "静音"}>
             {isMuted || volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
             </button>
           <input type="range" min="0" max="1" step="0.01" value={isMuted ? 0 : volume} onChange={handleVolumeChange} className="flex-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full accent-primary cursor-pointer" style={{ accentColor: 'hsl(var(--primary))' }} aria-label="音量控制" />
             <button
             onClick={() => setIsPlaylistViewOpen(!isPlaylistViewOpen)}
-            className={`p-1.5 rounded-md ${isPlaylistViewOpen ? 'bg-primary/10 text-primary' : 'hover:text-primary'} transition-[background-color] duration-150`}
+            className={`p-1.5 rounded-md ${isPlaylistViewOpen ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-primary'} transition-all duration-200 ease-in-out hover:scale-110 active:scale-95`}
             aria-label={isPlaylistViewOpen ? "关闭播放列表" : "打开播放列表"}
             >
             {isPlaylistViewOpen ? <X className="h-5 w-5" /> : <ListMusic className="h-5 w-5" />}
