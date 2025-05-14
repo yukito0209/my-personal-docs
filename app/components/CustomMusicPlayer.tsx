@@ -253,11 +253,6 @@ export function CustomMusicPlayer() {
               <div className="absolute inset-0 flex items-center justify-center">
                 {currentTrack?.coverUrl && (
                   <>
-                    {!coverLoaded && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full z-10"> {/* Spinner for cover */}
-                        <Music2 className="h-10 w-10 animate-spin text-white/80" />
-                      </div>
-                    )}
                     <Image
                       key={currentTrack.src} // Ensures re-render on track change
                       src={currentTrack.coverUrl}
@@ -300,10 +295,10 @@ export function CustomMusicPlayer() {
               />
             </div>
 
-            {/* Loading State Overlay */}
+            {/* Loading State Overlay for Song Loading */}
             {isLoading && !error && (
               <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/30 rounded-full">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent" />
+                <Music2 className="h-10 w-10 animate-spin text-white/80" />
               </div>
             )}
 
