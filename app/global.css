@@ -177,3 +177,99 @@ a:hover .nav-link-text {
   color: hsl(var(--primary)); /* 文本颜色变为主题主色 */
   transform: scale(1.1); /* 文本放大1.1倍 */
 }
+
+/* 
+  作用: 定义一个名为 spin-record 的 CSS 动画。
+  from { transform: rotate(0deg); }: 动画的起始状态。元素从没有旋转（0度）开始。
+  to { transform: rotate(360deg); }: 动画的结束状态。元素旋转一周（360度）。
+  用途: 这个关键帧动画将用于使唱片元素持续旋转。 
+*/
+@keyframes spin-record {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.record-disc-spinning {
+  /* 数值越小，旋转越快 */
+  animation: spin-record 25s linear infinite; /* 使唱片元素持续旋转 */
+}
+
+/* .record-disc-container { */
+  /* Basic black vinyl look */
+  /* background: 
+    repeating-radial-gradient(circle at center, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px),
+    radial-gradient(circle at center, #2c2c2c 24%, #1a1a1a 25%, #111 49%, #0a0a0a 50%); */
+/* } */
+
+/* .record-arm-pivot { */
+  /* A simple circle for the arm base */
+  /* width: 20px; */
+  /* height: 20px; */
+  /* background-color: #c0c0c0; */ /* Silver color */
+  /* border-radius: 50%; */
+  /* box-shadow: 0 0 5px rgba(0,0,0,0.5); */
+/* } */
+
+/* .record-arm-beam { */
+  /* The main beam of the arm */
+  /* height: 70%; */ /* Relative to its parent (the arm container) */
+  /* width: 8px; */
+  /* background-color: #d0d0d0; */ /* Light gray */
+  /* border-radius: 4px 4px 0 0; */
+  /* box-shadow: inset 0 0 2px rgba(0,0,0,0.3); */
+  /* position: absolute; */
+  /* bottom: 10px; */ /* Align with pivot center-ish */
+  /* left: 50%; */
+  /* transform-origin: bottom center; */
+  /* transform: translateX(-50%); */
+/* } */
+
+/* .record-arm-head { */
+  /* The "needle" end of the arm */
+  /* width: 16px; */
+  /* height: 12px; */
+  /* background-color: #a0a0a0; */ /* Darker gray */
+  /* border-radius: 2px; */
+  /* position: absolute; */
+  /* top: -8px; */ /* Position at the end of the beam */
+  /* left: 50%; */
+  /* transform: translateX(-50%); */
+  /* box-shadow: 0 1px 2px rgba(0,0,0,0.4); */
+/* } */
+
+/* --- 唱片固定反光效果 --- */
+.vinyl-player-wrapper::after { /* 左上角反光 */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%; /* 匹配唱片形状 */
+  background: radial-gradient(
+    circle at 30% 30%, /* 左上角高光位置 */
+    rgba(255, 255, 255, 0.12) 0%, /* 高光最亮部分 */
+    rgba(255, 255, 255, 0.06) 25%, /* 高光中间过渡部分 */
+    rgba(0, 0, 0, 0) 50%       /* 淡出至透明 */
+  );
+  pointer-events: none; /* 确保不影响鼠标交互 */
+  z-index: 6; /* 高于唱片 (z-5), 低于唱臂 (z-20) */
+}
+
+.vinyl-player-wrapper::before { /* 右下角反光 */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%; /* 匹配唱片形状 */
+  background: radial-gradient(
+    circle at 70% 70%, /* 右下角高光位置 */
+    rgba(255, 255, 255, 0.12) 0%, /* 高光最亮部分 */
+    rgba(255, 255, 255, 0.06) 25%, /* 高光中间过渡部分 */
+    rgba(0, 0, 0, 0) 50%       /* 淡出至透明 */
+  );
+  pointer-events: none; /* 确保不影响鼠标交互 */
+  z-index: 6; /* 与另一个反光同级, 高于唱片 (z-5) */
+}
