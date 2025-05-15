@@ -6,7 +6,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import { BackgroundViewToggle } from './components/BackgroundViewToggle';
 import type { Metadata } from 'next';
-import { Banner } from 'fumadocs-ui/components/banner';
+import DynamicLive2DLoader from './components/DynamicLive2DLoader';
 
 // Add metadata for favicon
 export const metadata: Metadata = {
@@ -38,6 +38,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <ThemeToggle />
                 <BackgroundViewToggle />
               </div>
+              <DynamicLive2DLoader />
             </MusicPlayerProvider>
           </ThemeProvider>
         </RootProvider>
