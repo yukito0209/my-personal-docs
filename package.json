@@ -18,6 +18,8 @@
     "lxgw-wenkai-webfont": "^1.7.0",
     "music-metadata": "^11.2.1",
     "next": "^15.3.1",
+    "pixi-live2d-display": "^0.4.0",
+    "pixi.js": "^6.5.9",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "sharp": "^0.34.1",
