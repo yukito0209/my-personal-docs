@@ -58,7 +58,7 @@ const Live2DWidget: React.FC = () => {
         console.log("[Live2D-Debug-SingleInit] PixiJS Application initialized:", app);
 
         console.log("[Live2D-Debug-SingleInit] Attempting to load Live2DModel from:", modelPath);
-        const model = await Live2DModel.from(modelPath, { autoInteract: false });
+        const model = await Live2DModel.from(modelPath, { autoInteract: false }); // 必须禁用自动交互
         modelRef.current = model;
         console.log("[Live2D-Debug-SingleInit] Live2D Model loaded:", model);
         console.log(`[Live2D-Debug-SingleInit] Model original width: ${model.width}, height: ${model.height}`);
@@ -89,6 +89,24 @@ const Live2DWidget: React.FC = () => {
         model.y = canvasHeight / 2;
         console.log(`[Live2D-Debug-SingleInit] Model position set to x: ${model.x}, y: ${model.y}`);
         
+        // Restore model interaction
+        model.on('hit', (hitAreaNames: string[]) => {
+          if (hitAreaNames.length > 0) {
+            console.log('[Live2D-Debug-SingleInit] Model hit on areas:', hitAreaNames);
+            // Example: Trigger a motion
+            // model.motion('TapBody', undefined, 3);
+            // Or if you have specific logic for Amiya based on hit areas:
+            if (hitAreaNames.includes('Head')) {
+              console.log('[Live2D-Debug-SingleInit] Amiya\'s head was touched.');
+              // model.motion('TapHead', undefined, 3); // Example motion
+            } else if (hitAreaNames.includes('Body')) {
+              console.log('[Live2D-Debug-SingleInit] Amiya\'s body was touched.');
+              // model.motion('TapBody', undefined, 3); // Example motion
+            }
+          }
+        });
+        console.log('[Live2D-Debug-SingleInit] Model hit listener attached.');
+
         console.log("[Live2D-Debug-SingleInit] Full setup complete.");
         hasInitializedRef.current = true; // Mark as initialized
 
