@@ -2,6 +2,13 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import * as PIXI from 'pixi.js';
+
+// Ensure PIXI is available on window *before* Live2DWidget or its dependencies (like pixi-live2d-display) are imported/evaluated.
+if (typeof window !== "undefined") {
+  (window as any).PIXI = PIXI;
+  console.log("[DynamicLoader] PIXI explicitly set on window object.");
+}
 
 // Placeholder for Live2DWidget until it's loaded
 const Live2DWidgetPlaceholder = () => <div style={{width: '150px', height: '220px', position: 'fixed', left: '10px', bottom: '0px', zIndex: 999, border: '1px dashed grey'}} />;
@@ -13,12 +20,12 @@ const Live2DWidget = dynamic(() => import('./Live2DWidget'), {
 });
 
 const DynamicLive2DLoader = () => {
-  const [cubism2RuntimeReady, setCubism2RuntimeReady] = useState(false);
+  // const [cubism2RuntimeReady, setCubism2RuntimeReady] = useState(false); // Removed
   const [cubismCoreRuntimeReady, setCubismCoreRuntimeReady] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
-    console.log("[DynamicLoader] useEffect: Initiating Cubism runtimes loading...");
+    console.log("[DynamicLoader] useEffect: Initiating Cubism Core runtime loading...");
 
     const loadScript = (id: string, src: string, checkGlobal: string, onReady: () => void, onError: (msg: string) => void) => {
       if (typeof window === 'undefined') {
@@ -73,25 +80,7 @@ const DynamicLive2DLoader = () => {
       document.body.appendChild(script);
     };
 
-    // Load Cubism 2 Runtime (live2d.min.js)
-    loadScript(
-      'cubism2-runtime-script',
-      'https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/live2d.min.js',
-      'L2Dwidget',
-      () => {
-        console.log("[DynamicLoader] Cubism 2 (L2Dwidget) reported as ready by loadScript.");
-        if (isMounted) setCubism2RuntimeReady(true);
-      },
-      (errMsg) => {
-        console.error("[DynamicLoader C2 Error]", errMsg);
-        console.log("[DynamicLoader] Even though L2Dwidget might not be defined, setting Cubism2RuntimeReady to true for leniency.");
-        if (isMounted) setCubism2RuntimeReady(true);
-      }
-    );
-
     // Load Cubism Core Runtime (live2dcubismcore.min.js)
-    // This will be triggered after the Cubism 2 attempt or in parallel if independent logic is desired
-    // For now, let's assume they can load somewhat independently, but the widget waits for both.
     loadScript(
       'cubism-core-runtime-script',
       'https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js',
@@ -106,15 +95,14 @@ const DynamicLive2DLoader = () => {
     };
   }, []); // Runs once on mount
 
-  if (!cubism2RuntimeReady || !cubismCoreRuntimeReady) {
-    let statusMessage = "Runtimes not ready: ";
-    if (!cubism2RuntimeReady) statusMessage += "Cubism2 (L2Dwidget) loading... ";
+  if (!cubismCoreRuntimeReady) {
+    let statusMessage = "Runtime not ready: ";
     if (!cubismCoreRuntimeReady) statusMessage += "CubismCore (Live2DCubismCore) loading...";
     console.log(`[DynamicLoader] ${statusMessage.trim()}, rendering placeholder.`);
     return <Live2DWidgetPlaceholder />;
   }
 
-  console.log("[DynamicLoader] Both Cubism 2 and Cubism Core runtimes ready, rendering Live2DWidget.");
+  console.log("[DynamicLoader] Cubism Core runtime ready, rendering Live2DWidget.");
   return <Live2DWidget />;
 };
 
