@@ -6,7 +6,8 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import { BackgroundViewToggle } from './components/BackgroundViewToggle';
 import type { Metadata } from 'next';
-import DynamicLive2DLoader from './components/DynamicLive2DLoader';
+// import DynamicLive2DLoader from './components/DynamicLive2DLoader'; // Replaced by InteractiveAmiya
+import InteractiveAmiya from './components/InteractiveAmiya'; // Import the new component
 
 // Add metadata for favicon
 export const metadata: Metadata = {
@@ -38,7 +39,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <ThemeToggle />
                 <BackgroundViewToggle />
               </div>
-              <DynamicLive2DLoader />
+              {/* <DynamicLive2DLoader /> Replaced by InteractiveAmiya below */}
+              <InteractiveAmiya /> {/* Add the new component here */}
             </MusicPlayerProvider>
           </ThemeProvider>
         </RootProvider>

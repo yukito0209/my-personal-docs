@@ -7,7 +7,6 @@ import InterestsSection from './components/InterestCard';
 import Footer from '@/app/components/Footer';
 import { CustomMusicPlayer } from '@/app/components/CustomMusicPlayer';
 import DynamicBangumiWidget from './components/DynamicBangumiWidget';
-import ChatInterface from './components/ChatInterface';
 
 interface Weekday {
   en: string; cn: string; ja: string; id: number;
@@ -169,7 +168,6 @@ export default async function HomePage() {
       </div>
 
       <Footer />
-      <ChatInterface />
     </main>
   );
 }

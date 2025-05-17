@@ -13,6 +13,9 @@ if (typeof window !== "undefined") {
 // Make sure this path is correct and accessible from the public folder
 const modelPath = "/live2d/阿米娅(1).model3.json"; // Path in the public folder
 
+const MODEL_WIDTH = Math.round(300 * (2/3)); // Approx 200
+const MODEL_HEIGHT = Math.round(440 * (2/3)); // Approx 293
+
 const Live2DWidget: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pixiAppRef = useRef<PIXI.Application | null>(null);
@@ -37,8 +40,8 @@ const Live2DWidget: React.FC = () => {
       try {
         const app = new PIXI.Application({
           view: canvasRef.current,
-          width: 300,
-          height: 440,
+          width: MODEL_WIDTH, // Use scaled width
+          height: MODEL_HEIGHT, // Use scaled height
           transparent: true, // For PixiJS v6.x
           // backgroundAlpha: 0, // Use this for PixiJS v7+ if transparent is deprecated
           autoDensity: true,
@@ -144,12 +147,9 @@ const Live2DWidget: React.FC = () => {
   return (
     <div 
       style={{ 
-        position: "fixed", 
-        left: "10px", 
-        bottom: "0px", 
-        zIndex: 1000, // Ensure it's above most other content
-        width: "300px", // Desired width of the Live2D widget
-        height: "440px", // Desired height of the Live2D widget
+        width: "100%", // Fill parent width (which will be 300px)
+        height: "100%", // Fill parent height (which will be 440px)
+        position: "relative", // Ensure canvas is positioned correctly within
         // border: "1px solid red" // Optional: for debugging container bounds
        }}
       title="Amia" // Added a title for accessibility/hover info
