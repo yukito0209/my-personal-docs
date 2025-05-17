@@ -82,12 +82,12 @@ const Live2DWidget: React.FC = () => {
         const canvasHeight = app.screen.height;
         const scaleToFit = Math.min(canvasWidth / model.internalModel.width, canvasHeight / model.internalModel.height);
         const appliedScale = scaleToFit * 0.9; 
-        model.scale.set(appliedScale);
+        (model as unknown as PIXI.Container).scale.set(appliedScale);
         console.log(`[Live2D-Debug-SingleInit] Calculated scaleToFit: ${scaleToFit}, applied scale: ${appliedScale}`);
 
-        model.x = canvasWidth / 2;
-        model.y = canvasHeight / 2;
-        console.log(`[Live2D-Debug-SingleInit] Model position set to x: ${model.x}, y: ${model.y}`);
+        (model as unknown as PIXI.Container).x = canvasWidth / 2;
+        (model as unknown as PIXI.Container).y = canvasHeight / 2;
+        console.log(`[Live2D-Debug-SingleInit] Model position set to x: ${(model as unknown as PIXI.Container).x}, y: ${(model as unknown as PIXI.Container).y}`);
         
         console.log("[Live2D-Debug-SingleInit] Full setup complete.");
         hasInitializedRef.current = true; // Mark as initialized
