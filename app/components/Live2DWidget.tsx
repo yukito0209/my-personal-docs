@@ -61,7 +61,7 @@ const Live2DWidget: React.FC = () => {
         const model = await Live2DModel.from(modelPath, { autoInteract: false }); // 必须禁用自动交互
         modelRef.current = model;
         console.log("[Live2D-Debug-SingleInit] Live2D Model loaded:", model);
-        console.log(`[Live2D-Debug-SingleInit] Model original width: ${model.width}, height: ${model.height}`);
+        console.log(`[Live2D-Debug-SingleInit] Model original width: ${model.internalModel.width}, height: ${model.internalModel.height}`);
 
         // Restore: Add to stage, scale, and position
         model.anchor.set(0.5, 0.5);
@@ -80,7 +80,7 @@ const Live2DWidget: React.FC = () => {
 
         const canvasWidth = app.screen.width;
         const canvasHeight = app.screen.height;
-        const scaleToFit = Math.min(canvasWidth / model.width, canvasHeight / model.height);
+        const scaleToFit = Math.min(canvasWidth / model.internalModel.width, canvasHeight / model.internalModel.height);
         const appliedScale = scaleToFit * 0.9; 
         model.scale.set(appliedScale);
         console.log(`[Live2D-Debug-SingleInit] Calculated scaleToFit: ${scaleToFit}, applied scale: ${appliedScale}`);
