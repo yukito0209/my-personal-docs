@@ -7,9 +7,10 @@ import { AssistantProvider } from './contexts/AssistantContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import { BackgroundViewToggle } from './components/BackgroundViewToggle';
 import { AssistantSwitcher } from './components/AssistantSwitcher';
+import ChatInterface from './components/ChatInterface';
 import type { Metadata } from 'next';
-// import DynamicLive2DLoader from './components/DynamicLive2DLoader'; // Replaced by InteractiveAmiya
-import InteractiveAssistant from './components/InteractiveAssistant';
+// import DynamicLive2DLoader from './components/DynamicLive2DLoader'; // Removed
+// import InteractiveAssistant from './components/InteractiveAssistant'; // Removed
 
 // Add metadata for favicon
 export const metadata: Metadata = {
@@ -43,8 +44,9 @@ export default function Layout({ children }: { children: ReactNode }) {
                   <BackgroundViewToggle />
                   <AssistantSwitcher />
                 </div>
-                {/* <DynamicLive2DLoader /> Replaced by InteractiveAmiya below */}
-                <InteractiveAssistant />
+                {/* <DynamicLive2DLoader /> Removed */}
+                {/* <InteractiveAssistant /> Removed */}
+                <ChatInterface />
               </AssistantProvider>
             </MusicPlayerProvider>
           </ThemeProvider>

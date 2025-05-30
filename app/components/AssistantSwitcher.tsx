@@ -1,80 +1,92 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { Check, ChevronUp } from 'lucide-react';
 import { useAssistant } from '../contexts/AssistantContext';
-import { ChevronsUpDown, Check } from 'lucide-react';
 
 export const AssistantSwitcher: React.FC = () => {
-  const { availableAssistants, currentAssistant, setCurrentAssistantId } = useAssistant();
+  const { assistants, currentAssistant, setCurrentAssistantById, toggleChat, openChat, isChatOpen } = useAssistant();
   const [isOpen, setIsOpen] = useState(false);
-  const switcherRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (switcherRef.current && !switcherRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
-
-  if (availableAssistants.length <= 1) return null;
+  const handleToggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
 
   const handleSelectAssistant = (assistantId: string) => {
-    setCurrentAssistantId(assistantId);
+    setCurrentAssistantById(assistantId);
+    if (!isChatOpen) {
+      openChat(); // Open chat if it's closed when switching assistant
+    }
     setIsOpen(false);
   };
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [wrapperRef]);
+
   return (
-    <div className="relative w-auto" ref={switcherRef}>
+    <div ref={wrapperRef} className="relative">
       <button
-        type="button"
-        className={`flex items-center justify-center p-2 text-sm bg-background border border-border rounded-full shadow-sm hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out cursor-pointer aspect-square transform active:scale-90 hover:shadow-md ${isOpen ? 'ring-2 ring-primary shadow-md' : ''}`}
-        onClick={() => setIsOpen(!isOpen)}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        title={`当前助手: ${currentAssistant.name}`}
+        onClick={handleToggleDropdown} 
+        className="rounded-full p-1.5 hover:bg-muted/80 active:bg-muted transition-all duration-150 ease-in-out transform active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        aria-label={isOpen ? "关闭助手列表" : "打开助手列表并切换助手"}
+        title="切换AI助手"
       >
-        <span className="flex items-center justify-center">
-          <img 
-            src={currentAssistant.avatarUrl}
-            alt={`${currentAssistant.name} avatar`}
-            className="w-6 h-6 rounded-full object-cover flex-shrink-0 transition-transform duration-200 ease-in-out group-hover:scale-105"
-          />
-        </span>
+        <Image 
+          src={currentAssistant.avatarUrl}
+          alt={`${currentAssistant.name} Avatar`}
+          width={28} 
+          height={28}
+          className="rounded-full object-cover border border-border/50"
+        />
       </button>
 
-      <div 
-        role="listbox"
-        className={`absolute bottom-0 right-full mr-2 w-48 max-h-60 overflow-y-auto bg-background border border-border rounded-md shadow-lg z-10 focus:outline-none py-1 glass-effect transition-all duration-200 ease-in-out transform ${isOpen ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 pointer-events-none -translate-x-2'}`}
-        style={{ transformOrigin: 'right center' }}
-      >
-        {availableAssistants.map((assistant) => (
-          <div
-            key={assistant.id}
-            onClick={() => handleSelectAssistant(assistant.id)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSelectAssistant(assistant.id)}
-            role="option"
-            aria-selected={assistant.id === currentAssistant.id}
-            tabIndex={0}
-            className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-primary/10 text-foreground transition-colors duration-150 ease-in-out data-[selected=true]:font-semibold data-[selected=true]:bg-primary/20`}
-            data-selected={assistant.id === currentAssistant.id}
-          >
-            <span className="flex items-center">
-              <img 
-                src={assistant.avatarUrl}
-                alt={`${assistant.name} avatar`}
-                className="w-5 h-5 rounded-full mr-2 object-cover flex-shrink-0"
-              />
-              <span className="truncate">{assistant.name}</span>
-            </span>
-            {assistant.id === currentAssistant.id && (
-              <Check size={16} className="ml-2 text-primary flex-shrink-0" />
-            )}
+      {isOpen && (
+        <div 
+          className={`absolute bottom-full right-0 mb-2 w-64 bg-popover border border-border rounded-lg shadow-lg p-2 z-50 
+                      origin-bottom-right transition-all duration-200 ease-out 
+                      ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}
+        >
+          <div className="flex justify-between items-center mb-1 px-1 pt-0.5">
+            <p className="text-sm font-medium text-foreground">选择助手</p>
+            <ChevronUp size={16} className="text-muted-foreground" />
           </div>
-        ))}
-      </div>
+          <ul className="space-y-1">
+            {assistants.map((assistant) => (
+              <li key={assistant.id}>
+                <button
+                  onClick={() => handleSelectAssistant(assistant.id)}
+                  className="w-full flex items-center justify-between text-left px-2 py-1.5 text-sm rounded-md hover:bg-muted transition-colors duration-150 ease-in-out focus:outline-none focus-visible:bg-muted"
+                >
+                  <div className="flex items-center gap-2">
+                    <Image 
+                      src={assistant.avatarUrl}
+                      alt={`${assistant.name} Avatar`}
+                      width={24} 
+                      height={24}
+                      className="rounded-full object-cover border border-border/30"
+                    />
+                    <span className='text-foreground'>{assistant.name}</span>
+                  </div>
+                  {currentAssistant.id === assistant.id && (
+                    <Check size={16} className="text-primary" />
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }; 

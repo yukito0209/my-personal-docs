@@ -10,11 +10,6 @@ interface Message {
   sender: 'user' | 'ai';
 }
 
-interface ChatInterfaceProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
 const INITIAL_CHAT_WIDTH = 320;
 const MIN_CHAT_WIDTH = 250;
 const MAX_CHAT_WIDTH_MARGIN = 20;
@@ -28,11 +23,8 @@ const CHAT_INPUT_HEIGHT = 50;
 const CHAT_PADDING_VERTICAL = 16 * 2;
 const WINDOW_DRAG_VIEWPORT_MARGIN = 10;
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
-  isOpen, 
-  onClose, 
-}) => {
-  const { currentAssistant } = useAssistant();
+const ChatInterface: React.FC = () => {
+  const { currentAssistant, isChatOpen, closeChat } = useAssistant();
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,20 +58,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, []);
 
   useEffect(() => {
-    if (isOpen && windowDimensions.width > 0 && windowDimensions.height > 0 && !isPositionInitialized) {
+    if (isChatOpen && windowDimensions.width > 0 && windowDimensions.height > 0 && !isPositionInitialized) {
       const totalChatHeight = chatSize.contentHeight + CHAT_HEADER_HEIGHT + CHAT_INPUT_HEIGHT + CHAT_PADDING_VERTICAL;
       const initialTop = Math.max(WINDOW_DRAG_VIEWPORT_MARGIN, (windowDimensions.height - totalChatHeight) / 2);
       const initialLeft = Math.max(WINDOW_DRAG_VIEWPORT_MARGIN, (windowDimensions.width - chatSize.width) / 2);
       setWindowPosition({ top: initialTop, left: initialLeft });
       setIsPositionInitialized(true);
     }
-    if (!isOpen) {
+    if (!isChatOpen) {
       setIsPositionInitialized(false); 
     }
-  }, [isOpen, windowDimensions, chatSize.width, chatSize.contentHeight, isPositionInitialized]);
+  }, [isChatOpen, windowDimensions, chatSize.width, chatSize.contentHeight, isPositionInitialized]);
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  useEffect(() => { if (isOpen) scrollToBottom(); }, [messages, isOpen]);
+  useEffect(() => { if (isChatOpen) scrollToBottom(); }, [messages, isChatOpen]);
 
   const handleMouseDownOnResizeHandle = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -202,7 +194,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           systemPrompt: currentAssistant.systemPrompt 
         }) 
       });
-      setMessages(prev => prev.filter(m => m.id !== aiMessageId)); 
+      setMessages(prev => prev.filter(m => m.id !== aiMessageId));
       if (!response.ok) {
         let errorText = `Failed to get response from ${currentAssistant.name}.`;
         try { const errorData = await response.json(); errorText = errorData.error || errorText; } catch (parseError) { errorText = response.statusText || errorText; }
@@ -221,14 +213,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } finally { setIsLoading(false); }
   };
 
-  if (!isOpen) {
+  if (!isChatOpen) {
     return null;
   }
 
   return (
     <div 
       ref={chatWindowRef}
-      className={`fixed p-4 rounded-lg shadow-xl glass-effect border border-border transition-opacity duration-300 ease-in-out ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
+      className={`fixed p-4 rounded-lg shadow-xl glass-effect border border-border transition-opacity duration-300 ease-in-out ${isChatOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
       style={{
         left: `${windowPosition.left}px`,
         top: `${windowPosition.top}px`,
@@ -249,7 +241,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <Move size={16} className="text-muted-foreground" aria-hidden="true" />
             <h3 className="text-md font-semibold text-foreground select-none">与{currentAssistant.name}对话</h3>
           </div>
-          <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground transition-colors" aria-label="关闭聊天">
+          <button onClick={closeChat} className="p-1 text-muted-foreground hover:text-foreground transition-colors" aria-label="关闭聊天">
             <X size={18} />
           </button>
         </div>
