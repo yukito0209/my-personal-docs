@@ -3,19 +3,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import ChatInterface from './ChatInterface';
-
-const OLD_MODEL_WIDTH = 300;
-const OLD_MODEL_HEIGHT = 440;
-const SCALE_FACTOR = 2 / 3;
-
-const MODEL_WIDTH = Math.round(OLD_MODEL_WIDTH * SCALE_FACTOR);
-const MODEL_HEIGHT = Math.round(OLD_MODEL_HEIGHT * SCALE_FACTOR);
+import { useAssistant } from '../contexts/AssistantContext';
 
 const DynamicLive2DLoader = dynamic(() => import('./DynamicLive2DLoader'), {
   ssr: false,
   loading: () => (
-    <div style={{ width: `${MODEL_WIDTH}px`, height: `${MODEL_HEIGHT}px`, display: 'flex', alignItems:'center', justifyContent:'center', border: '1px dashed grey' }}>
-      <p style={{color: 'grey', fontSize: '10px'}}>Loading Amiya...</p>
+    <div style={{ width: `200px`, height: `293px`, display: 'flex', alignItems:'center', justifyContent:'center', border: '1px dashed grey' }}>
+      <p style={{color: 'grey', fontSize: '10px'}}>Loading Assistant...</p>
     </div>
   ),
 });
@@ -23,7 +17,11 @@ const DynamicLive2DLoader = dynamic(() => import('./DynamicLive2DLoader'), {
 const CLICK_THRESHOLD_PIXELS = 5;
 const CLICK_THRESHOLD_MS = 250;
 
-const InteractiveAmiya: React.FC = () => {
+const InteractiveAssistant: React.FC = () => {
+  const { currentAssistant } = useAssistant();
+  const modelWidth = currentAssistant.modelWidth || 200;
+  const modelHeight = currentAssistant.modelHeight || 293;
+
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -34,17 +32,14 @@ const InteractiveAmiya: React.FC = () => {
   useEffect(() => {
     setPosition({
       x: 10, 
-      y: window.innerHeight - MODEL_HEIGHT - 0, 
+      y: window.innerHeight - modelHeight - 0, 
     });
-  }, []);
+  }, [modelHeight]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!position) return;
-    // Record mouse down position and time for click detection
     mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
     mouseDownTimeRef.current = Date.now();
-
-    // Standard drag initialization
     setIsDragging(true);
     dragOffsetRef.current = {
       x: e.clientX - position.x,
@@ -60,8 +55,8 @@ const InteractiveAmiya: React.FC = () => {
       let newX = e.clientX - dragOffsetRef.current.x;
       let newY = e.clientY - dragOffsetRef.current.y;
 
-      const maxX = window.innerWidth - MODEL_WIDTH;
-      const maxY = window.innerHeight - MODEL_HEIGHT;
+      const maxX = window.innerWidth - modelWidth;
+      const maxY = window.innerHeight - modelHeight;
       newX = Math.max(0, Math.min(newX, maxX));
       newY = Math.max(0, Math.min(newY, maxY));
 
@@ -76,7 +71,6 @@ const InteractiveAmiya: React.FC = () => {
         const elapsedTime = Date.now() - mouseDownTimeRef.current;
 
         if (distance < CLICK_THRESHOLD_PIXELS && elapsedTime < CLICK_THRESHOLD_MS) {
-          // It's a click!
           toggleChat();
         }
       }
@@ -93,7 +87,7 @@ const InteractiveAmiya: React.FC = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, position]); // toggleChat is stable, no need to add to deps if defined outside
+  }, [isDragging, position, modelWidth, modelHeight]);
 
   const toggleChat = () => {
     setIsChatOpen(prev => !prev);
@@ -101,8 +95,8 @@ const InteractiveAmiya: React.FC = () => {
 
   if (!position) {
     return (
-        <div style={{ width: `${MODEL_WIDTH}px`, height: `${MODEL_HEIGHT}px`, position: 'fixed', left: '10px', bottom: '0px', zIndex: 999, border: '1px dashed grey', display: 'flex', alignItems:'center', justifyContent:'center' }}>
-            <p style={{color: 'grey', fontSize: '10px'}}>Initializing Amiya...</p>
+        <div style={{ width: `${modelWidth}px`, height: `${modelHeight}px`, position: 'fixed', left: '10px', bottom: '0px', zIndex: 999, border: '1px dashed grey', display: 'flex', alignItems:'center', justifyContent:'center' }}>
+            <p style={{color: 'grey', fontSize: '10px'}}>Initializing {currentAssistant.name}...</p>
         </div>
     );
   }
@@ -114,25 +108,23 @@ const InteractiveAmiya: React.FC = () => {
           position: 'fixed',
           left: `${position.x}px`,
           top: `${position.y}px`,
-          width: `${MODEL_WIDTH}px`,
-          height: `${MODEL_HEIGHT}px`,
+          width: `${modelWidth}px`,
+          height: `${modelHeight}px`,
           zIndex: 999,
           cursor: isDragging ? 'grabbing' : 'grab',
         }}
         onMouseDown={handleMouseDown}
       >
         <DynamicLive2DLoader />
+        {/* <div>Temp Placeholder for Live2D</div> */}
       </div>
 
       <ChatInterface 
         isOpen={isChatOpen} 
         onClose={() => setIsChatOpen(false)} 
-        modelPosition={position}
-        modelWidth={MODEL_WIDTH}
-        modelHeight={MODEL_HEIGHT}
       />
     </>
   );
 };
 
-export default InteractiveAmiya; 
+export default InteractiveAssistant; 

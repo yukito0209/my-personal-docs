@@ -3,11 +3,13 @@ import { RootProvider } from 'fumadocs-ui/provider';
 import type { ReactNode } from 'react';
 import { MusicPlayerProvider } from './contexts/MusicPlayerContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AssistantProvider } from './contexts/AssistantContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import { BackgroundViewToggle } from './components/BackgroundViewToggle';
+import { AssistantSwitcher } from './components/AssistantSwitcher';
 import type { Metadata } from 'next';
 // import DynamicLive2DLoader from './components/DynamicLive2DLoader'; // Replaced by InteractiveAmiya
-import InteractiveAmiya from './components/InteractiveAmiya'; // Import the new component
+import InteractiveAssistant from './components/InteractiveAssistant';
 
 // Add metadata for favicon
 export const metadata: Metadata = {
@@ -29,18 +31,21 @@ export default function Layout({ children }: { children: ReactNode }) {
         <RootProvider theme={{ defaultTheme: 'system', enableSystem: true }}>
           <ThemeProvider>
             <MusicPlayerProvider>
-              <div id="main-content-wrapper">
-                {/* 网站横幅开始 */}
-                {/* <Banner variant="rainbow" id="1">个人网站绝赞施工中(๑•̀ㅂ•́)و✧</Banner>  */}
-                {/* 网站横幅结束 */}
-                {children}
-              </div>
-              <div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6 flex flex-col-reverse items-end gap-2">
-                <ThemeToggle />
-                <BackgroundViewToggle />
-              </div>
-              {/* <DynamicLive2DLoader /> Replaced by InteractiveAmiya below */}
-              <InteractiveAmiya /> {/* Add the new component here */}
+              <AssistantProvider>
+                <div id="main-content-wrapper">
+                  {/* 网站横幅开始 */}
+                  {/* <Banner variant="rainbow" id="1">个人网站绝赞施工中(๑•̀ㅂ•́)و✧</Banner>  */}
+                  {/* 网站横幅结束 */}
+                  {children}
+                </div>
+                <div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6 flex flex-col-reverse items-center md:items-end gap-2">
+                  <ThemeToggle />
+                  <BackgroundViewToggle />
+                  <AssistantSwitcher />
+                </div>
+                {/* <DynamicLive2DLoader /> Replaced by InteractiveAmiya below */}
+                <InteractiveAssistant />
+              </AssistantProvider>
             </MusicPlayerProvider>
           </ThemeProvider>
         </RootProvider>

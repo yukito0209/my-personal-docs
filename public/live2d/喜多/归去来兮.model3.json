@@ -1,0 +1,23 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "归去来兮.moc3",
+		"Textures": [
+			"归去来兮.4096/texture_00.png"
+		],
+		"Physics": "归去来兮.physics3.json",
+		"DisplayInfo": "归去来兮.cdi3.json"
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		}
+	]
+}
