@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     ];
 
     const payload = {
-      model: 'mistralai/mistral-7b-instruct:free',
+      model: 'deepseek/deepseek-r1-0528:free',
       messages: apiMessages,
     };
 
