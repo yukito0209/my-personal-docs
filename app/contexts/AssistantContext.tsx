@@ -1,47 +1,67 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { assistants, AssistantConfig, defaultAssistantId } from '../config/assistants';
 
 interface AssistantContextType {
-  availableAssistants: AssistantConfig[];
+  assistants: AssistantConfig[];
   currentAssistant: AssistantConfig;
-  setCurrentAssistantId: (id: string) => void;
+  setCurrentAssistantById: (id: string) => void;
+  isChatOpen: boolean;
+  toggleChat: () => void;
+  openChat: () => void;
+  closeChat: () => void;
 }
 
 const AssistantContext = createContext<AssistantContextType | undefined>(undefined);
 
-export const AssistantProvider = ({ children }: { children: ReactNode }) => {
-  const [currentId, setCurrentId] = useState<string>(defaultAssistantId);
+export const AssistantProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [currentAssistantId, setCurrentAssistantId] = useState(defaultAssistantId);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const currentAssistant = useMemo(() => {
-    return assistants.find(a => a.id === currentId) || assistants.find(a => a.id === defaultAssistantId)!;
-  }, [currentId]);
+  const currentAssistant = assistants.find(a => a.id === currentAssistantId) || assistants[0];
 
-  const setCurrentAssistantId = useCallback((id: string) => {
-    const assistantExists = assistants.some(a => a.id === id);
-    if (assistantExists) {
-      setCurrentId(id);
+  const setCurrentAssistantById = (id: string) => {
+    const newAssistant = assistants.find(a => a.id === id);
+    if (newAssistant) {
+      setCurrentAssistantId(id);
     } else {
-      console.warn(`Assistant with id "${id}" not found. Falling back to default.`);
-      setCurrentId(defaultAssistantId);
+      console.warn(`Assistant with id "${id}" not found.`);
     }
-  }, []);
+  };
 
-  const value = useMemo(() => ({
-    availableAssistants: assistants,
-    currentAssistant,
-    setCurrentAssistantId,
-  }), [currentAssistant, setCurrentAssistantId]);
+  const toggleChat = () => {
+    setIsChatOpen(prev => !prev);
+  };
+
+  const openChat = () => {
+    setIsChatOpen(true);
+  };
+
+  const closeChat = () => {
+    setIsChatOpen(false);
+  };
+
+  useEffect(() => {
+    console.log(`Assistant changed to: ${currentAssistant.name}. Chat is ${isChatOpen ? 'open' : 'closed'}.`);
+  }, [currentAssistantId, currentAssistant.name, isChatOpen]);
 
   return (
-    <AssistantContext.Provider value={value}>
+    <AssistantContext.Provider value={{ 
+        assistants, 
+        currentAssistant, 
+        setCurrentAssistantById, 
+        isChatOpen, 
+        toggleChat,
+        openChat,
+        closeChat
+    }}>
       {children}
     </AssistantContext.Provider>
   );
 };
 
-export const useAssistant = (): AssistantContextType => {
+export const useAssistant = () => {
   const context = useContext(AssistantContext);
   if (context === undefined) {
     throw new Error('useAssistant must be used within an AssistantProvider');
