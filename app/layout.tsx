@@ -9,8 +9,6 @@ import { BackgroundViewToggle } from './components/BackgroundViewToggle';
 import { AssistantSwitcher } from './components/AssistantSwitcher';
 import ChatInterface from './components/ChatInterface';
 import type { Metadata } from 'next';
-// import DynamicLive2DLoader from './components/DynamicLive2DLoader'; // Removed
-// import InteractiveAssistant from './components/InteractiveAssistant'; // Removed
 
 // Add metadata for favicon
 export const metadata: Metadata = {
@@ -27,6 +25,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       <head>
         <link rel="preload" href="/backgrounds/bg_light.webp" as="image" type="image/webp" />
         <link rel="preload" href="/backgrounds/bg_dark.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/backgrounds/docs_light.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/backgrounds/docs_dark.webp" as="image" type="image/webp" />
       </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider theme={{ defaultTheme: 'system', enableSystem: true }}>
@@ -44,8 +44,6 @@ export default function Layout({ children }: { children: ReactNode }) {
                   <BackgroundViewToggle />
                   <AssistantSwitcher />
                 </div>
-                {/* <DynamicLive2DLoader /> Removed */}
-                {/* <InteractiveAssistant /> Removed */}
                 <ChatInterface />
               </AssistantProvider>
             </MusicPlayerProvider>

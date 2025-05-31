@@ -10,7 +10,7 @@ interface Message {
   sender: 'user' | 'ai';
 }
 
-const INITIAL_CHAT_WIDTH = 320;
+const INITIAL_CHAT_WIDTH = 640;
 const MIN_CHAT_WIDTH = 250;
 const MAX_CHAT_WIDTH_MARGIN = 20;
 
@@ -213,14 +213,10 @@ const ChatInterface: React.FC = () => {
     } finally { setIsLoading(false); }
   };
 
-  if (!isChatOpen) {
-    return null;
-  }
-
   return (
     <div 
       ref={chatWindowRef}
-      className={`fixed p-4 rounded-lg shadow-xl glass-effect border border-border transition-opacity duration-300 ease-in-out ${isChatOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
+      className={`fixed p-4 rounded-lg shadow-xl glass-effect border border-border transition-opacity transition-transform duration-300 ease-in-out ${isChatOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-16 pointer-events-none'}`}
       style={{
         left: `${windowPosition.left}px`,
         top: `${windowPosition.top}px`,
@@ -241,7 +237,7 @@ const ChatInterface: React.FC = () => {
             <Move size={16} className="text-muted-foreground" aria-hidden="true" />
             <h3 className="text-md font-semibold text-foreground select-none">与{currentAssistant.name}对话</h3>
           </div>
-          <button onClick={closeChat} className="p-1 text-muted-foreground hover:text-foreground transition-colors" aria-label="关闭聊天">
+          <button onClick={closeChat} className="p-1 text-muted-foreground hover:text-foreground transition-all duration-150 ease-in-out hover:scale-110 active:scale-90" aria-label="关闭聊天">
             <X size={18} />
           </button>
         </div>
@@ -277,7 +273,7 @@ const ChatInterface: React.FC = () => {
           <input type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder={isLoading ? `${currentAssistant.name}思考中...` : "有什么想说的..."} className="flex-grow p-2 text-sm border border-input rounded-md focus:ring-2 focus:ring-primary focus:outline-none bg-transparent placeholder:text-muted-foreground" disabled={isLoading} />
           <button 
             type="submit" 
-            className="p-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors duration-200 disabled:opacity-50 flex-shrink-0"
+            className="p-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 flex-shrink-0 hover:scale-105 active:scale-95"
             disabled={isLoading}
             aria-label="发送消息"
           >

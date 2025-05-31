@@ -283,3 +283,14 @@ a:hover .nav-link-text {
 .song-info-enter {
   animation: songInfoFadeIn 0.5s ease-in-out forwards;
 }
+
+/* --- 文档页面专门的背景图设置 --- */
+body.docs-page::before {
+  /* 文档页面浅色模式背景图 */
+  background-image: url('/backgrounds/docs_light.webp') !important;
+}
+
+.dark body.docs-page::before {
+  /* 文档页面深色模式背景图 */
+  background-image: url('/backgrounds/docs_dark.webp') !important;
+}
