@@ -1,0 +1,639 @@
+/* --- QQ风格聊天面板样式 --- */
+
+/* 面板容器 */
+.qq-chat-panel {
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 面板动画 */
+@keyframes qqPanelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes qqPanelSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+}
+
+.qq-panel-enter {
+  animation: qqPanelSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.qq-panel-exit {
+  animation: qqPanelSlideOut 0.3s ease-in-out forwards;
+}
+
+.qq-panel-dragging {
+  transform: rotate(1deg);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+}
+
+/* 标题栏 */
+.qq-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--secondary) / 0.1));
+  border-bottom: 1px solid hsl(var(--border));
+  cursor: grab;
+  user-select: none;
+  backdrop-filter: blur(10px);
+}
+
+.qq-panel-header:active {
+  cursor: grabbing;
+}
+
+.qq-panel-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: hsl(var(--foreground));
+}
+
+.qq-close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: hsl(var(--muted-foreground));
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.qq-close-button:hover {
+  background: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
+  transform: scale(1.1);
+}
+
+/* 主要内容区域 */
+.qq-panel-content {
+  display: flex;
+  height: calc(100% - 56px); /* 减去标题栏高度 */
+}
+
+/* 左侧助手列表 */
+.qq-assistant-list {
+  background: hsl(var(--background) / 0.8);
+  border-right: 1px solid hsl(var(--border));
+  display: flex;
+  flex-direction: column;
+}
+
+.qq-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.3);
+}
+
+.qq-list-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+/* 助手列表项 */
+.qq-assistant-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.qq-assistant-item:hover {
+  background: hsl(var(--muted) / 0.5);
+  transform: translateX(2px);
+}
+
+.qq-assistant-active {
+  background: hsl(var(--primary) / 0.1);
+  border-left-color: hsl(var(--primary));
+}
+
+.qq-assistant-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, hsl(var(--primary)), hsl(var(--primary) / 0.5));
+}
+
+.qq-assistant-avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.qq-online-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border: 2px solid hsl(var(--background));
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+.qq-unread-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  background: hsl(var(--destructive));
+  border-radius: 50%;
+  border: 2px solid hsl(var(--background));
+}
+
+.qq-assistant-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.qq-assistant-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: hsl(var(--foreground));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qq-assistant-status {
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+  margin-top: 2px;
+}
+
+/* 右侧聊天区域 */
+.qq-chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: hsl(var(--background) / 0.5);
+}
+
+.qq-chat-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.2);
+}
+
+.qq-chat-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: hsl(var(--foreground));
+}
+
+.qq-chat-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+  margin-top: 2px;
+}
+
+.qq-online-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+/* 消息容器 */
+.qq-messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  scroll-behavior: smooth;
+}
+
+.qq-messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.qq-messages-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.qq-messages-container::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+.qq-messages-container::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* 欢迎消息 */
+.qq-welcome-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px 20px;
+  opacity: 0;
+  animation: qqWelcomeSlideIn 0.8s ease-out 0.3s forwards;
+}
+
+@keyframes qqWelcomeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.qq-welcome-avatar {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.qq-welcome-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--secondary)));
+  z-index: -1;
+  opacity: 0.2;
+  animation: pulse 3s infinite;
+}
+
+.qq-welcome-text h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: 8px;
+}
+
+.qq-welcome-text p {
+  font-size: 14px;
+  color: hsl(var(--muted-foreground));
+  max-width: 300px;
+}
+
+/* 消息项基础样式 */
+.qq-message-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+/* AI消息布局 - 左对齐 */
+.qq-message-item.qq-message-ai {
+  flex-direction: row;
+  justify-content: flex-start;
+  margin-right: auto;
+  width: fit-content;
+  max-width: 85%;
+}
+
+/* 用户消息布局 - 右对齐 */
+.qq-message-item.qq-message-user {
+  flex-direction: row-reverse !important;
+  justify-content: flex-start !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  width: fit-content !important;
+  max-width: 85% !important;
+}
+
+.qq-message-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.qq-message-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* 更强的选择器 - 确保用户消息在右侧 */
+.qq-messages-container .qq-message-item.qq-message-user {
+  flex-direction: row-reverse !important;
+  justify-content: flex-start !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  width: fit-content !important;
+  max-width: 85% !important;
+}
+
+/* 更强的选择器 - 确保AI消息在左侧 */
+.qq-messages-container .qq-message-item.qq-message-ai {
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  width: fit-content !important;
+  max-width: 85% !important;
+}
+
+/* 消息头像 */
+.qq-message-avatar {
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* 用户消息中的头像 - 确保在右侧 */
+.qq-message-item.qq-message-user .qq-message-avatar {
+  order: 1; /* 确保头像在右侧 */
+}
+
+/* AI消息中的头像 - 确保在左侧 */
+.qq-message-item.qq-message-ai .qq-message-avatar {
+  order: 1; /* 确保头像在左侧 */
+}
+
+/* 用户消息中的气泡 - 确保在左侧 */
+.qq-message-item.qq-message-user .qq-message-bubble {
+  order: 2; /* 确保气泡在左侧（相对于头像） */
+}
+
+/* AI消息中的气泡 - 确保在右侧 */
+.qq-message-item.qq-message-ai .qq-message-bubble {
+  order: 2; /* 确保气泡在右侧（相对于头像） */
+}
+
+.qq-message-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, hsl(var(--primary) / 0.2), hsl(var(--secondary) / 0.2));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.qq-message-item:hover .qq-message-avatar::after {
+  opacity: 1;
+}
+
+/* 消息气泡 */
+.qq-message-bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+  word-wrap: break-word;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.qq-bubble-user {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+  color: hsl(var(--primary-foreground));
+  border-bottom-right-radius: 6px;
+}
+
+.qq-bubble-ai {
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border-bottom-left-radius: 6px;
+  border: 1px solid hsl(var(--border));
+}
+
+.qq-bubble-error {
+  background: hsl(var(--destructive) / 0.1) !important;
+  color: hsl(var(--destructive)) !important;
+  border-color: hsl(var(--destructive) / 0.3) !important;
+}
+
+.qq-message-item:hover .qq-message-bubble {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 打字指示器 */
+.qq-typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  background: hsl(var(--muted));
+  border-radius: 16px;
+  border-bottom-left-radius: 6px;
+  border: 1px solid hsl(var(--border));
+  animation: qqTypingPulse 2s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+@keyframes qqTypingPulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.qq-typing-indicator.fade-out {
+  animation: qqTypingFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes qqTypingFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* 输入区域 */
+.qq-input-area {
+  padding: 16px;
+  border-top: 1px solid hsl(var(--border));
+  background: hsl(var(--background) / 0.8);
+  backdrop-filter: blur(10px);
+}
+
+.qq-input-form {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.qq-message-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 20px;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.qq-message-input:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+  transform: translateY(-1px);
+}
+
+.qq-message-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.qq-message-input::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.qq-send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+  color: hsl(var(--primary-foreground));
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.3);
+}
+
+.qq-send-button:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 16px hsl(var(--primary) / 0.4);
+}
+
+.qq-send-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.95);
+  animation: qqSendPulse 0.6s ease-out;
+}
+
+.qq-send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.1);
+}
+
+@keyframes qqSendPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px hsl(var(--primary) / 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .qq-chat-panel {
+    width: calc(100vw - 20px) !important;
+    height: calc(100vh - 20px) !important;
+    top: 10px !important;
+    left: 10px !important;
+  }
+  
+  .qq-assistant-list {
+    width: 200px !important;
+  }
+  
+  .qq-assistant-name {
+    font-size: 13px;
+  }
+  
+  .qq-message-bubble {
+    max-width: 85%;
+    font-size: 13px;
+  }
+}
+
+/* 高对比度模式优化 */
+@media (prefers-contrast: high) {
+  .qq-chat-panel {
+    border: 2px solid hsl(var(--foreground));
+    backdrop-filter: none;
+  }
+  
+  .qq-assistant-item:hover {
+    background: hsl(var(--muted));
+  }
+  
+  .qq-message-bubble {
+    border-width: 2px;
+  }
+}
+
+/* 减少动效模式 */
+@media (prefers-reduced-motion: reduce) {
+  .qq-chat-panel,
+  .qq-message-item,
+  .qq-welcome-message,
+  .qq-typing-indicator {
+    animation: none !important;
+    transition: opacity 0.2s ease !important;
+  }
+  
+  .qq-message-item:hover .qq-message-bubble,
+  .qq-send-button:hover:not(:disabled) {
+    transform: none !important;
+  }
+} 

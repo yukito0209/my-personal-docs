@@ -7,7 +7,7 @@ import { AssistantProvider } from './contexts/AssistantContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import { BackgroundViewToggle } from './components/BackgroundViewToggle';
 import { AssistantSwitcher } from './components/AssistantSwitcher';
-import ChatInterface from './components/ChatInterface';
+import QQChatPanel from './components/QQChatPanel';
 import type { Metadata } from 'next';
 
 // Add metadata for favicon
@@ -44,7 +44,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                   <BackgroundViewToggle />
                   <AssistantSwitcher />
                 </div>
-                <ChatInterface />
+                <QQChatPanel />
               </AssistantProvider>
             </MusicPlayerProvider>
           </ThemeProvider>

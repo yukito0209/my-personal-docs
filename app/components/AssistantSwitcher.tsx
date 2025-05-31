@@ -1,92 +1,61 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
-import { Check, ChevronUp } from 'lucide-react';
 import { useAssistant } from '../contexts/AssistantContext';
 
 export const AssistantSwitcher: React.FC = () => {
   const { assistants, currentAssistant, setCurrentAssistantById, toggleChat, openChat, isChatOpen } = useAssistant();
-  const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleToggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleSelectAssistant = (assistantId: string) => {
-    setCurrentAssistantById(assistantId);
+    // 直接打开聊天界面，不显示下拉菜单
     if (!isChatOpen) {
-      openChat(); // Open chat if it's closed when switching assistant
+      openChat();
+    } else {
+      // 如果聊天已经打开，可以选择关闭或保持打开
+      // 这里我们选择保持聊天打开，因为用户可能想继续使用
+      // 如果您希望点击后关闭聊天，可以取消下面的注释
+      toggleChat();
     }
-    setIsOpen(false);
   };
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [wrapperRef]);
 
   return (
     <div ref={wrapperRef} className="relative">
       <button
         onClick={handleToggleDropdown}
-        className="w-10 h-10 rounded-full flex items-center justify-center bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-muted transition-all duration-150 ease-in-out transform active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        aria-label={isOpen ? "关闭助手列表" : "打开助手列表并切换助手"}
-        title="切换AI助手"
+        className={`
+          assistant-avatar-button w-10 h-10 rounded-full flex items-center justify-center 
+          bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 
+          active:bg-muted transition-all duration-300 ease-in-out 
+          transform hover:scale-110 active:scale-95 
+          focus:outline-none focus-visible:ring-2 focus-visible:ring-primary 
+          focus-visible:ring-offset-2 focus-visible:ring-offset-background
+          shadow-sm hover:shadow-md
+        `}
+        aria-label={!isChatOpen ? "打开聊天对话" : "聊天对话已打开"}
+        title={!isChatOpen ? "打开聊天对话" : "与当前助手对话"}
       >
-        <Image
-          src={currentAssistant.avatarUrl}
-          alt={`${currentAssistant.name} Avatar`}
-          width={28}
-          height={28}
-          className="rounded-full object-cover border border-border/50"
-        />
-      </button>
-
-      {isOpen && (
-        <div 
-          className={`absolute bottom-full right-0 mb-2 w-64 bg-popover border border-border rounded-lg shadow-lg p-2 z-50 
-                      origin-bottom-right transition-all duration-200 ease-out 
-                      glass-effect ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}
-        >
-          <div className="flex justify-between items-center mb-1 px-1 pt-0.5">
-            <p className="text-sm font-medium text-foreground">选择助手</p>
-            <ChevronUp size={16} className="text-muted-foreground" />
-          </div>
-          <ul className="space-y-1">
-            {assistants.map((assistant) => (
-              <li key={assistant.id}>
-                <button
-                  onClick={() => handleSelectAssistant(assistant.id)}
-                  className="w-full flex items-center justify-between text-left px-2 py-1.5 text-sm rounded-md hover:bg-muted transition-colors duration-150 ease-in-out focus:outline-none focus-visible:bg-muted"
-                >
-                  <div className="flex items-center gap-2">
-                    <Image 
-                      src={assistant.avatarUrl}
-                      alt={`${assistant.name} Avatar`}
-                      width={24} 
-                      height={24}
-                      className="rounded-full object-cover border border-border/30"
-                    />
-                    <span className='text-foreground'>{assistant.name}</span>
-                  </div>
-                  {currentAssistant.id === assistant.id && (
-                    <Check size={16} className="text-primary" />
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
+        <div className="assistant-avatar-container relative">
+          <Image
+            src={currentAssistant.avatarUrl}
+            alt={`${currentAssistant.name} Avatar`}
+            width={28}
+            height={28}
+            className={`
+              rounded-full object-cover border border-border/50 
+              transition-all duration-300 ease-in-out
+              ${isChatOpen ? 'brightness-110 ring-2 ring-primary/30' : ''}
+            `}
+          />
+          {isChatOpen && (
+            <div className={`
+              absolute inset-0 rounded-full bg-primary/20 
+              transition-opacity duration-300 ease-in-out opacity-100
+            `} />
+          )}
         </div>
-      )}
+      </button>
     </div>
   );
-}; 
+};
