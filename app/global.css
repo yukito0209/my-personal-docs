@@ -3,6 +3,7 @@
 @import 'fumadocs-ui/css/preset.css';
 @import 'lxgw-wenkai-webfont/lxgwwenkai-regular.css'; /* Import specific regular weight */
 @import 'lxgw-wenkai-webfont/lxgwwenkai-bold.css';    /* Import specific bold weight */
+@import './styles/qq-chat.css'; /* QQ聊天界面样式 */
 
 /* 隐藏 Fumadocs UI 的默认主题切换按钮 */
 [data-theme-toggle] {
@@ -194,49 +195,6 @@ a:hover .nav-link-text {
   animation: spin-record 25s linear infinite; /* 使唱片元素持续旋转 */
 }
 
-/* .record-disc-container { */
-  /* Basic black vinyl look */
-  /* background: 
-    repeating-radial-gradient(circle at center, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px),
-    radial-gradient(circle at center, #2c2c2c 24%, #1a1a1a 25%, #111 49%, #0a0a0a 50%); */
-/* } */
-
-/* .record-arm-pivot { */
-  /* A simple circle for the arm base */
-  /* width: 20px; */
-  /* height: 20px; */
-  /* background-color: #c0c0c0; */ /* Silver color */
-  /* border-radius: 50%; */
-  /* box-shadow: 0 0 5px rgba(0,0,0,0.5); */
-/* } */
-
-/* .record-arm-beam { */
-  /* The main beam of the arm */
-  /* height: 70%; */ /* Relative to its parent (the arm container) */
-  /* width: 8px; */
-  /* background-color: #d0d0d0; */ /* Light gray */
-  /* border-radius: 4px 4px 0 0; */
-  /* box-shadow: inset 0 0 2px rgba(0,0,0,0.3); */
-  /* position: absolute; */
-  /* bottom: 10px; */ /* Align with pivot center-ish */
-  /* left: 50%; */
-  /* transform-origin: bottom center; */
-  /* transform: translateX(-50%); */
-/* } */
-
-/* .record-arm-head { */
-  /* The "needle" end of the arm */
-  /* width: 16px; */
-  /* height: 12px; */
-  /* background-color: #a0a0a0; */ /* Darker gray */
-  /* border-radius: 2px; */
-  /* position: absolute; */
-  /* top: -8px; */ /* Position at the end of the beam */
-  /* left: 50%; */
-  /* transform: translateX(-50%); */
-  /* box-shadow: 0 1px 2px rgba(0,0,0,0.4); */
-/* } */
-
 /* --- 唱片固定反光效果 --- */
 .vinyl-player-wrapper::after { /* 左上角反光 */
   content: "";
@@ -293,4 +251,648 @@ body.docs-page::before {
 .dark body.docs-page::before {
   /* 文档页面深色模式背景图 */
   background-image: url('/backgrounds/docs_dark.webp') !important;
+}
+
+/* --- 聊天界面动画系统 --- */
+
+/* 聊天窗口弹出动画 */
+@keyframes chatWindowSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes chatWindowSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+}
+
+.chat-window-enter {
+  animation: chatWindowSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.chat-window-exit {
+  animation: chatWindowSlideOut 0.3s ease-in-out forwards;
+}
+
+/* 消息气泡弹出动画 */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.9);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes messageSlideInUser {
+  from {
+    opacity: 0;
+    transform: translateX(20px) translateY(10px) scale(0.9);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-2px) translateY(-2px) scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1);
+  }
+}
+
+@keyframes messageSlideInAI {
+  from {
+    opacity: 0;
+    transform: translateX(-20px) translateY(10px) scale(0.9);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(2px) translateY(-2px) scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1);
+  }
+}
+
+.message-bubble {
+  animation-fill-mode: both;
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.message-bubble-user {
+  animation-name: messageSlideInUser;
+}
+
+.message-bubble-ai {
+  animation-name: messageSlideInAI;
+}
+
+/* 消息气泡悬停效果 */
+.message-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+/* 打字指示器动画 */
+@keyframes typingDot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+@keyframes typingPulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes typingFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 12px;
+  background: hsl(var(--muted));
+  border-radius: 12px;
+  animation: typingPulse 2s ease-in-out infinite;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.typing-indicator.fade-out {
+  animation: typingFadeOut 0.3s ease-out forwards;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background: hsl(var(--muted-foreground));
+  border-radius: 50%;
+  animation: typingDot 1.5s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* 头像动画 */
+@keyframes avatarPop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.message-avatar {
+  animation: avatarPop 0.4s ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+/* 输入框动画 */
+.chat-input {
+  transition: all 0.3s ease-in-out;
+}
+
+.chat-input:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.chat-input:disabled {
+  opacity: 0.6;
+  transform: none;
+}
+
+/* 发送按钮动画 */
+@keyframes sendPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.send-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.send-button:not(:disabled):active {
+  animation: sendPulse 0.6s ease-out;
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 聊天内容区域滚动动画 */
+.chat-messages {
+  scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  transition: background-color 0.3s ease;
+}
+
+.chat-messages:hover::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.7);
+}
+
+/* 欢迎消息动画 */
+@keyframes welcomeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-message {
+  animation: welcomeSlideIn 0.6s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+/* 聊天窗口拖拽状态 */
+.chat-window-dragging {
+  cursor: grabbing !important;
+  transform: rotate(1deg);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+/* 聊天窗口调整大小状态 */
+.chat-window-resizing {
+  transition: none;
+}
+
+.chat-window-resizing * {
+  pointer-events: none;
+}
+
+/* 助手切换动画 */
+@keyframes assistantSwitch {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.assistant-switching .message-avatar {
+  animation: assistantSwitch 0.6s ease-in-out;
+}
+
+/* 消息删除动画 */
+@keyframes messageSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    max-height: 100px;
+    margin-bottom: 8px;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.9);
+    max-height: 0;
+    margin-bottom: 0;
+  }
+}
+
+.message-removing {
+  animation: messageSlideOut 0.3s ease-in-out forwards;
+}
+
+/* 错误消息特殊动画 */
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.message-error {
+  animation: errorShake 0.4s ease-in-out;
+  border-color: hsl(var(--destructive)) !important;
+  background: hsl(var(--destructive) / 0.1) !important;
+}
+
+/* 加载状态动画 */
+@keyframes loadingPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.message-loading {
+  animation: loadingPulse 1.5s ease-in-out infinite;
+}
+
+/* 响应式动画优化 */
+@media (max-width: 768px) {
+  .message-bubble {
+    animation-duration: 0.3s;
+  }
+  
+  .chat-window-enter {
+    animation-duration: 0.3s;
+  }
+  
+  .typing-indicator {
+    animation-duration: 1.5s;
+  }
+}
+
+/* 减少动效模式 */
+@media (prefers-reduced-motion: reduce) {
+  .message-bubble,
+  .chat-window-enter,
+  .chat-window-exit,
+  .typing-indicator,
+  .message-avatar,
+  .welcome-message {
+    animation: none !important;
+    transition: opacity 0.2s ease !important;
+  }
+  
+  .message-bubble:hover {
+    transform: none !important;
+  }
+}
+
+/* --- 助手切换器动画 --- */
+
+/* 头像按钮动画 */
+.assistant-avatar-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.assistant-avatar-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+  z-index: 0;
+}
+
+.assistant-avatar-button:active::before {
+  width: 60px;
+  height: 60px;
+}
+
+.assistant-avatar-container {
+  z-index: 1;
+}
+
+/* 新增美化动画 */
+@keyframes pulse-gentle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes twinkle-delay {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  25% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.animate-twinkle-delay {
+  animation: twinkle-delay 2.5s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* 下拉菜单进入动画 */
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdownSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+}
+
+.assistant-dropdown {
+  animation: dropdownSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 助手选项动画 */
+.assistant-option {
+  position: relative;
+  overflow: hidden;
+}
+
+.assistant-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(59, 130, 246, 0.1),
+    transparent
+  );
+  transition: left 0.6s ease;
+  z-index: 0;
+}
+
+.assistant-option:hover::before {
+  left: 100%;
+}
+
+.assistant-option > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 头像脉冲效果 */
+@keyframes avatarPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.assistant-option-avatar:hover {
+  animation: avatarPulse 1.5s ease-in-out infinite;
+}
+
+/* 复选标记动画 */
+@keyframes checkMark {
+  0% {
+    transform: scale(0) rotate(-45deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(-45deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.assistant-option [class*="opacity-100"] svg {
+  animation: checkMark 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 磁性悬停效果 */
+.assistant-option:hover {
+  transform: translateX(2px) translateY(-1px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* 激活状态特殊效果 */
+.assistant-option:active {
+  transform: translateX(1px) translateY(0px) scale(0.98);
+}
+
+/* 下拉菜单背景模糊增强 */
+.assistant-dropdown {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dark .assistant-dropdown {
+  background: rgba(24, 24, 27, 0.9);
+}
+
+/* 渐变边框效果 */
+.assistant-dropdown::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2),
+    rgba(147, 51, 234, 0.1),
+    rgba(59, 130, 246, 0.2)
+  );
+  border-radius: inherit;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .assistant-dropdown {
+    width: 240px;
+    animation-duration: 0.2s;
+  }
+  
+  .assistant-option:hover {
+    transform: translateX(1px);
+  }
+}
+
+/* 高对比度模式优化 */
+@media (prefers-contrast: high) {
+  .assistant-dropdown {
+    border-width: 2px;
+    backdrop-filter: none;
+    background: hsl(var(--popover));
+  }
+  
+  .assistant-option {
+    border: 1px solid transparent;
+  }
+  
+  .assistant-option:hover {
+    border-color: hsl(var(--primary));
+  }
 }
