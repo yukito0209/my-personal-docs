@@ -267,13 +267,12 @@ const QQChatPanel: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [panelSize, setPanelSize] = useState({ width: INITIAL_PANEL_WIDTH, height: INITIAL_PANEL_HEIGHT });
-  const [panelPosition, setPanelPosition] = useState<{ top: number, left: number }>({ top: 0, left: 0 });
+  const [panelPosition, setPanelPosition] = useState<{ top: number, left: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [resizeType, setResizeType] = useState<ResizeType>('none');
   const [assistantListWidth, setAssistantListWidth] = useState(ASSISTANT_LIST_WIDTH);
   const [windowDimensions, setWindowDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
-  const [isPositionInitialized, setIsPositionInitialized] = useState(false);
 
   const dragStartOffsetRef = useRef<{ x: number, y: number }>({ x: 0, y: 0 });
   const resizeStartRef = useRef<{ x: number, y: number, width: number, height: number, assistantListWidth?: number } | null>(null);
@@ -286,6 +285,7 @@ const QQChatPanel: React.FC = () => {
     const handleResize = () => {
       setWindowDimensions({ width: window.innerWidth, height: window.innerHeight });
     };
+    
     if (typeof window !== 'undefined') {
       handleResize();
       window.addEventListener('resize', handleResize);
@@ -293,18 +293,20 @@ const QQChatPanel: React.FC = () => {
     }
   }, []);
 
-  // 初始化面板位置
+  // 聊天窗口打开时立即计算并设置中央位置
   useEffect(() => {
-    if (isChatOpen && windowDimensions.width > 0 && windowDimensions.height > 0 && !isPositionInitialized) {
+    if (isChatOpen && windowDimensions.width > 0 && windowDimensions.height > 0) {
       const initialTop = Math.max(20, (windowDimensions.height - panelSize.height) / 2);
       const initialLeft = Math.max(20, (windowDimensions.width - panelSize.width) / 2);
       setPanelPosition({ top: initialTop, left: initialLeft });
-      setIsPositionInitialized(true);
+    } else if (!isChatOpen && panelPosition !== null) {
+      // 延迟清空位置，给关闭动画时间完成
+      const timer = setTimeout(() => {
+        setPanelPosition(null);
+      }, 300); // 匹配关闭动画时长
+      return () => clearTimeout(timer);
     }
-    if (!isChatOpen) {
-      setIsPositionInitialized(false);
-    }
-  }, [isChatOpen, windowDimensions, panelSize, isPositionInitialized]);
+  }, [isChatOpen, windowDimensions.width, windowDimensions.height, panelSize.width, panelSize.height]);
 
   // 滚动到底部
   const scrollToBottom = useCallback(() => {
@@ -336,10 +338,10 @@ const QQChatPanel: React.FC = () => {
     
     // 使用当前面板位置状态计算偏移量，而不是DOM的offset值
     dragStartOffsetRef.current = {
-      x: e.clientX - panelPosition.left,
-      y: e.clientY - panelPosition.top,
+      x: e.clientX - panelPosition!.left,
+      y: e.clientY - panelPosition!.top,
     };
-  }, [panelPosition.left, panelPosition.top]);
+  }, [panelPosition]);
 
   // 拖拽效果
   useEffect(() => {
@@ -431,24 +433,24 @@ const QQChatPanel: React.FC = () => {
       switch (resizeType) {
         case 'right': {
           const newWidth = Math.max(MIN_PANEL_WIDTH, 
-            Math.min(windowDimensions.width - panelPosition.left - 20, 
+            Math.min(windowDimensions.width - panelPosition!.left - 20, 
               resizeStartRef.current.width + deltaX));
           setPanelSize(prev => ({ ...prev, width: newWidth }));
           break;
         }
         case 'bottom': {
           const newHeight = Math.max(MIN_PANEL_HEIGHT, 
-            Math.min(windowDimensions.height - panelPosition.top - 20, 
+            Math.min(windowDimensions.height - panelPosition!.top - 20, 
               resizeStartRef.current.height + deltaY));
           setPanelSize(prev => ({ ...prev, height: newHeight }));
           break;
         }
         case 'corner': {
           const newWidth = Math.max(MIN_PANEL_WIDTH, 
-            Math.min(windowDimensions.width - panelPosition.left - 20, 
+            Math.min(windowDimensions.width - panelPosition!.left - 20, 
               resizeStartRef.current.width + deltaX));
           const newHeight = Math.max(MIN_PANEL_HEIGHT, 
-            Math.min(windowDimensions.height - panelPosition.top - 20, 
+            Math.min(windowDimensions.height - panelPosition!.top - 20, 
               resizeStartRef.current.height + deltaY));
           setPanelSize({ width: newWidth, height: newHeight });
           break;
@@ -617,18 +619,28 @@ const QQChatPanel: React.FC = () => {
 
   const panelClasses = `
     fixed qq-chat-panel glass-effect border border-border
-    ${isChatOpen ? 'qq-panel-enter' : 'qq-panel-exit opacity-0 pointer-events-none'}
+    ${isChatOpen && panelPosition !== null ? 'qq-panel-enter' : 'qq-panel-exit'}
     ${isDragging ? 'qq-panel-dragging' : ''}
     ${isResizing ? 'qq-panel-resizing' : ''}
   `;
+
+  // 如果聊天窗口应该打开但位置还没有计算完成，不渲染面板
+  if (isChatOpen && panelPosition === null) {
+    return null;
+  }
+
+  // 如果聊天窗口已关闭且位置已清空，不渲染面板
+  if (!isChatOpen && panelPosition === null) {
+    return null;
+  }
 
   return (
     <div 
       ref={chatPanelRef}
       className={panelClasses}
       style={{
-        left: `${panelPosition.left}px`,
-        top: `${panelPosition.top}px`,
+        left: `${panelPosition?.left || 0}px`,
+        top: `${panelPosition?.top || 0}px`,
         width: `${panelSize.width}px`,
         height: `${panelSize.height}px`,
         zIndex: 1001,
