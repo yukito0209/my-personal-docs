@@ -896,3 +896,222 @@ body.docs-page::before {
     border-color: hsl(var(--primary));
   }
 }
+
+/* --- 一键工具页面专用动画效果 --- */
+
+/* 扫描进度条动画 */
+@keyframes scanPulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.scan-progress {
+  animation: scanPulse 1.5s ease-in-out infinite;
+}
+
+/* 按钮悬停特效 */
+@keyframes buttonGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.6);
+  }
+}
+
+.onekey-button:hover:not(:disabled) {
+  animation: buttonGlow 2s ease-in-out infinite;
+}
+
+/* 状态卡片动画 */
+@keyframes statusCardSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status-card-enter {
+  animation: statusCardSlide 0.5s ease-out forwards;
+}
+
+/* 扫描状态指示器 */
+@keyframes scanSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.scan-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.3) 50%,
+    transparent 100%
+  );
+  animation: scanSweep 2s ease-in-out infinite;
+}
+
+/* 功能卡片悬停效果 */
+.feature-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.feature-card:hover:not(.disabled) {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(59, 130, 246, 0.2);
+}
+
+/* 成功状态动画 */
+@keyframes successBounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -10px, 0);
+  }
+  70% {
+    transform: translate3d(0, -5px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+.success-bounce {
+  animation: successBounce 1s ease-in-out;
+}
+
+/* 错误状态抖动动画 */
+@keyframes errorShakeHorizontal {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.error-shake {
+  animation: errorShakeHorizontal 0.5s ease-in-out;
+}
+
+/* 渐变文字效果 */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(-45deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  background-size: 400% 400%;
+  animation: gradientShift 3s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 工具图标脉冲效果 */
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.tool-icon {
+  animation: iconPulse 2s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* 加载状态的旋转效果 */
+@keyframes loadingSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spin {
+  animation: loadingSpin 1s linear infinite;
+}
+
+/* 即将推出的功能卡片样式 */
+.coming-soon-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.coming-soon-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  transition: left 0.8s ease;
+}
+
+.coming-soon-card:hover::before {
+  left: 100%;
+}
+
+/* 响应式动画优化 */
+@media (max-width: 768px) {
+  .onekey-button:hover:not(:disabled) {
+    animation: none;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  
+  .feature-card:hover:not(.disabled) {
+    transform: translateY(-4px) scale(1.01);
+  }
+}
+
+/* 减少动效模式适配 */
+@media (prefers-reduced-motion: reduce) {
+  .scan-progress,
+  .onekey-button:hover:not(:disabled),
+  .tool-icon,
+  .loading-spin,
+  .gradient-text {
+    animation: none !important;
+  }
+  
+  .feature-card:hover:not(.disabled) {
+    transform: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
