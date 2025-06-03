@@ -8,6 +8,7 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { BackgroundViewToggle } from './components/BackgroundViewToggle';
 import { AssistantSwitcher } from './components/AssistantSwitcher';
 import QQChatPanel from './components/QQChatPanel';
+import SessionProvider from './components/SessionProvider';
 import type { Metadata } from 'next';
 
 // Add metadata for favicon
@@ -30,24 +31,26 @@ export default function Layout({ children }: { children: ReactNode }) {
       </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider theme={{ defaultTheme: 'system', enableSystem: true }}>
-          <ThemeProvider>
-            <MusicPlayerProvider>
-              <AssistantProvider>
-                <div id="main-content-wrapper">
-                  {/* 网站横幅开始 */}
-                  {/* <Banner variant="rainbow" id="1">个人网站绝赞施工中(๑•̀ㅂ•́)و✧</Banner>  */}
-                  {/* 网站横幅结束 */}
-                  {children}
-                </div>
-                <div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6 flex flex-col-reverse items-center md:items-end gap-2">
-                  <ThemeToggle />
-                  <BackgroundViewToggle />
-                  <AssistantSwitcher />
-                </div>
-                <QQChatPanel />
-              </AssistantProvider>
-            </MusicPlayerProvider>
-          </ThemeProvider>
+          <SessionProvider>
+            <ThemeProvider>
+              <MusicPlayerProvider>
+                <AssistantProvider>
+                  <div id="main-content-wrapper">
+                    {/* 网站横幅开始 */}
+                    {/* <Banner variant="rainbow" id="1">个人网站绝赞施工中(๑•̀ㅂ•́)و✧</Banner>  */}
+                    {/* 网站横幅结束 */}
+                    {children}
+                  </div>
+                  <div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6 flex flex-col-reverse items-center md:items-end gap-2">
+                    <ThemeToggle />
+                    <BackgroundViewToggle />
+                    <AssistantSwitcher />
+                  </div>
+                  <QQChatPanel />
+                </AssistantProvider>
+              </MusicPlayerProvider>
+            </ThemeProvider>
+          </SessionProvider>
         </RootProvider>
       </body>
     </html>
