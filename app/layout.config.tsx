@@ -1,5 +1,5 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { BookText, Image as ImageIcon, Info, Zap } from 'lucide-react';
+import { BookText, Image as ImageIcon, Info, Zap, MessageSquare } from 'lucide-react';
 import React from 'react';
 import { siGithub } from 'simple-icons/icons';
 
@@ -58,6 +58,15 @@ export const baseOptions: BaseLayoutProps = {
         </>
       ),
       url: '/onekey',
+    },
+    {
+      text: (
+        <>
+          <MessageSquare className="mr-1.2 h-4 w-4 nav-link-icon" />
+          <span className="nav-link-text">留言板</span>
+        </>
+      ),
+      url: '/guestbook',
     },
     {
       text: (
