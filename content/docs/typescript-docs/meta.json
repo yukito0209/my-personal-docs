@@ -1,0 +1,19 @@
+{
+  "title": "TypeScript 文档",
+  "description": "TypeScript 官方文档的个人中文翻译版本",
+  "root": true,
+  "full": true,
+  "icon": "Cog",
+  "pages": [
+      "---开始使用 Getting Started---",
+      "get-started/ts-for-the-new-programmer",
+      "---手册 Handbook---",
+      "---参考 Reference---",
+      "---模块参考 Modules Reference---",
+      "---教程 Tutorials---",
+      "---声明文件 Declaration Files---",
+      "---JavaScript---",
+      "---项目配置 Project Configuration---",
+      "---速查表 Cheat Sheets---"
+  ]
+}

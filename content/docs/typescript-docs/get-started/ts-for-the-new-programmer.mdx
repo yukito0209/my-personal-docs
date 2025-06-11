@@ -1,0 +1,107 @@
+---
+title: TS for the New Programmer
+description: 为萌新程序员准备的 TypeScript 教程，翻译自：https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html
+---
+
+恭喜你选择 TypeScript 作为你的第一个编程语言——这是个很棒的决定！
+
+也许你已经听说过 TypeScript 是 JavaScript 的一种“调料”或者“变体”。在现代编程语言中，TypeScript (TS) 与 JavaScript (JS) 的关系相当特殊，因此，深入了解这种关系有助于你理解 TypeScript 是如何在 JavaScript 的基础上进行扩展的。
+
+## 什么是 JavaScript？一段简史 What is JavaScript? A Brief History
+
+JavaScript（又称 ECMAScript）最初是作为浏览器简易脚本语言问世的。在其诞生之初，人们只是想用它在网页中嵌入简短的代码片段——极少有人用它编写超过几十行的代码。正因如此，早期网页浏览器执行这类代码的速度很慢。然而随着时间的推移，JS 变得越来越流行，网页开发者们也开始用它来打造交互式体验。
+
+网页浏览器开发者们针对 JavaScript 使用量激增的情形优化了执行引擎（采用动态编译技术），并扩展了其功能（增加 API 接口），而这反过来又促使网页开发者们更多地去使用 JavaScript。在现代网站中，浏览器需要频繁地运行数十万行代码构成的应用程序。这就是“万维网”漫长而渐进的发展历程——从最初由静态页面构成的简单网络，逐步演变为能够承载各类丰富*应用*的平台。
+
+不止如此，JavaScript 在浏览器之外也有很多应用，比如用 node.js 部署 JS 服务器。JavaScript “随处运行”的特性使它成为跨平台开发的理想选择。如今有许多开发者*仅仅*使用 JavaScript 就能完成整个技术栈的编程！
+
+总而言之，我们拥有这样一门语言：它最初为快速使用而设计，随后逐步发展为能编写数百万行代码应用程序的成熟工具。每种语言都有其*独特之处*——各种奇特的设定和出人意料的特性，而 JavaScript 那卑微的出身让它在这方面*尤为突出*。以下是一些例子：
+
+- JavaScript 的等值运算符（`==`）会强制转换操作数类型，从而导致意外行为：
+```js
+if ("" == 0) {
+  // 他们相等！但是为什么呢？？
+}
+if (1 < x < 3) {
+  // x 是 *任何* 值都为真！
+}
+```
+- JavaScript 还允许访问不存在的属性：
+```js
+const obj = { width: 10, height: 15 };
+// 为什么是 NaN？拼写好难！
+const area = obj.width * obj.heigth;
+```
+
+大多数编程语言在发生这类错误时会抛出异常，有些甚至会在编译阶段——即任何代码运行之前就报错。编写小型程序时，这些特性虽令人困扰但尚可应付；但是，当你开发有成百上千行代码的程序时，这些层出不穷的意外状况就会导致严重的问题。
+
+## TypeScript：静态类型检查器 TypeScript: A Static Type Checker
+
+我们之前提到，有的语言根本不允许这些全是 bug 的程序运行。不运行代码就能检测出其中的错误，这就是*静态检查*。而根据操作数值的类型来判断是否存在错误，就叫做静态*类型*检查。
+
+TypeScript 会在执行前检查程序是否有错误，该检查机制基于*值的类型*，因此属于*静态类型检查器*。例如上文最后一个例子中，`obj` 的*类型*存在错误，以下是 TypeScript 检测到的错误：
+```ts
+const obj = { width: 10, height: 15 };
+const area = obj.width * obj.heigth;
+```
+> Property 'heigth' does not exist on type '\{ width: number; height: number; }'. Did you mean 'height'?
+
+### JavaScript 的类型化超集 A Typed Superset of JavaScript
+
+不过，TypeScript 和 JavaScript 有什么关系呢？
+
+#### 语法 Syntax
+
+TypeScript 是 JavaScript 的*超集*语言，因此 JS 的语法在 TS 中同样有效。语法指的是我们编写文本来构建程序的方式。例如，下面这段代码由于缺少右括号 `)` 而存在*语法*错误：
+```ts
+let a = (4
+```
+> ')' expected.
+
+TypeScript 不会将任何正确的 JavaScript 代码视为错误。这意味着你可以直接将可运行的 JavaScript 代码放入 TypeScript 文件中执行，无需担心其具体编写方式。
+
+#### 类型 Types
+
+然而，TypeScript 是一种类型化超集，这表明它增加了关于如何使用不同类型值的规则。先前有关 `obj.heigth` 的错误并不是*语法*错误：它属于以不正确方式使用某种值（*类型*）的错误。
+
+再举个例子，这是一段可以在浏览器中运行的 JavaScript 代码，它会输出一个值：
+```js
+console.log(4 / []);
+```
+
+这个语法上合法的程序会输出 `Infinity`。然而，TypeScript 会认为用数字除以数组是无意义的操作，因此会报错：
+```ts
+console.log(4 / []);
+```
+> The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+
+有可能你*确实*想用一个数组来除以某个数字，只是想看看会发生什么，但在大多数情况下，这就是个编程错误。TypeScript 的类型检查器旨在确保正确的程序能被执行，同时也尽可能地捕获更多常见错误。（稍后我们将学习如何通过设置来配置 TypeScript 检查代码的严格程度。）
+
+如果你将部分代码从 JavaScript 文件移动到 TypeScript 文件，可能会基于你的代码编写方式看到某些*类型错误*。这些可能是代码本身存在的真实问题，也可能是 TypeScript 过于保守的代码检查所导致的。本教程将全程演示如何通过添加各类 TypeScript 语法来消除这些错误。
+
+#### 运行时行为 Runtime Behavior
+
+TypeScript 也是一种保留 JavaScript 的*运行时行为*的编程语言。例如，在 JavaScript 中除以零会显示 `Infinity` 而非抛出运行时异常。TypeScript 始终坚持一个原则：**绝不**改变 JavaScript 代码的运行时行为。
+
+这意味着，即使你将代码从 JavaScript 移动到 TypeScript，即使 TypeScript 认为该代码存在类型错误，也仍可以保证以相同的方式运行。
+
+保持与 JavaScript 相同的运行时行为是 TypeScript 的基本承诺，这意味着你可以轻松地在两种语言之间转换，而不必担心由于一些细微差别而使程序停止工作。
+
+
+#### 擦除类型 Erased Types
+
+简单来说，TypeScript 编译器完成代码检查后，会*擦除*类型信息来生成最终的“经过编译的”代码。这说明编译完成后所产生的纯 JS 代码不包含任何类型信息。
+
+这也表明 TypeScript 绝不会根据它推断出的类型来改变程序的*行为*。关键在于，虽然你在编译时可能会看到类型错误，但类型系统本身并不会影响程序运行时的实际表现。
+
+最后，TypeScript 不提供任何额外的运行时库。你的程序将使用与 JavaScript 程序相同的标准库（或外部库），因此并不需要学习特别针对 TypeScript 的额外框架。
+
+## 学习 JavaScript 和 TypeScript Learning JavaScript and TypeScript
+
+我们经常看到这样的问题：“我应该学 JavaScript 还是 TypeScript ？”。
+
+答案就是，不学 JavaScript 就无法学会 TypeScript！TypeScript 与 JavaScript 共享语法和运行时行为，因此你学到的任何关于 JavaScript 的知识，同时也在帮助你掌握 TypeScript。
+
+程序员学习 JavaScript 的资源非常丰富；如果你正在编写 TypeScript 代码，就不该忽视这些资源。例如，StackOverflow 上标记为 `javascript` 的问题数量是 `typescript` 的20倍之多，但所有关于 JavaScript 的问题同样适用于 TypeScript 。
+
+如果你正在搜索类似“如何在 TypeScript 中对列表进行排序”这样的问题，请记住：**TypeScript 本质上就是带有编译时类型检查器的 JavaScript 运行时环境**。在 TypeScript 中对列表排序的方法与在 JavaScript 中完全一致。当然，如果你能找到直接使用 TypeScript 的解决方案也很棒，但不必局限地认为所有关于运行时任务的日常问题都需要 TypeScript 专属的答案。
